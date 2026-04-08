@@ -167,3 +167,51 @@ export async function getAssessments() {
     throw new Error("Failed to fetch assessments");
   }
 }
+
+
+export async function evaluateVoiceInterview(history, jobDescription) {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+
+  const prompt = `
+    You are an expert technical interviewer. Review the following transcript of a mock voice interview for the following job description:
+    
+    Job Description: ${jobDescription}
+
+    Interview Transcript:
+    ${history.map(m => `${m.role.toUpperCase()}: ${m.content}`).join('\n')}
+
+    Evaluate the candidate's performance based on technical accuracy, communication clarity, and behavioral alignment.
+    
+    Return the response in this JSON format ONLY:
+    {
+      "scores": {
+        "technical": <number 1-10>,
+        "communication": <number 1-10>,
+        "overall": <number 1-10>
+      },
+      "feedback": "A concise paragraph summarizing strengths and areas for improvement",
+      "keyMetrics": ["<metric 1>", "<metric 2>", "<metric 3>"]
+    }
+  `;
+
+  try {
+    const completion = await openai.chat.completions.create({
+      model: "gpt-5-nano", // Using the same model as your audio route
+      messages: [
+        {
+          role: "system",
+          content: "You are a technical evaluator. Output only valid JSON.",
+        },
+        { role: "user", content: prompt },
+      ],
+      response_format: { type: "json_object" }, 
+    });
+
+    const text = completion.choices[0].message.content;
+    return JSON.parse(text);
+  } catch (error) {
+    console.error("Error evaluating interview:", error);
+    throw new Error("Failed to evaluate interview");
+  }
+}

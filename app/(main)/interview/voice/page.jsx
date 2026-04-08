@@ -1,172 +1,193 @@
 "use client";
 
-import React, { useState, useRef } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Mic, Square, Loader2, Volume2, UploadCloud, Play } from 'lucide-react';
-import pdfToText from 'react-pdftotext'; // NEW: Client-side parser
+import React, { useState, useRef } from "react";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
+import {
+  Mic,
+  Square,
+  Loader2,
+  UploadCloud,
+  CheckCircle2,
+} from "lucide-react";
+
+import pdfToText from "react-pdftotext";
+import { evaluateVoiceInterview } from "@/actions/interview";
 
 export default function VoiceInterviewPage() {
-  // Setup State
   const [isSetupComplete, setIsSetupComplete] = useState(false);
   const [jobDescription, setJobDescription] = useState("");
   const [resumeFile, setResumeFile] = useState(null);
   const [resumeText, setResumeText] = useState("");
   const [isParsingPdf, setIsParsingPdf] = useState(false);
 
-  // Interview State
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [messages, setMessages] = useState([]);
-  
+
+  const [isEvaluating, setIsEvaluating] = useState(false);
+  const [results, setResults] = useState(null);
+
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
 
-  // NEW: Handle PDF Parsing directly in the browser!
+  // ================= RESET =================
+  const resetInterview = () => {
+    setResults(null);
+    setMessages([]);
+    setIsSetupComplete(false);
+    setJobDescription("");
+    setResumeFile(null);
+    setResumeText("");
+  };
+
+  // ================= SETUP =================
   const handleStartInterview = async () => {
     if (!jobDescription || !resumeFile) {
-      alert("Please provide both a job description and a resume.");
+      alert("Provide job description & resume");
       return;
     }
 
     setIsParsingPdf(true);
     try {
-      // Magically extract text in the browser
-      const extractedText = await pdfToText(resumeFile);
-      
-      setResumeText(extractedText);
+      const text = await pdfToText(resumeFile);
+      setResumeText(text);
       setIsSetupComplete(true);
-      
-      // Add an initial greeting to the chat
-      setMessages([{ role: 'ai', text: "Hello! I have reviewed your resume and the job description. Whenever you are ready, hit 'Start Recording' and introduce yourself to begin the interview." }]);
-    } catch (error) {
-      console.error("PDF extraction failed", error);
-      alert("Failed to read the resume. Please ensure it is a valid text-based PDF.");
+
+      setMessages([
+        {
+          role: "ai",
+          text: "I've had a look at your resume. Feel free to introduce yourself whenever you're ready",
+        },
+      ]);
     } finally {
       setIsParsingPdf(false);
     }
   };
 
+  // ================= RECORD =================
   const startRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
-      mediaRecorderRef.current = mediaRecorder;
-      audioChunksRef.current = [];
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const recorder = new MediaRecorder(stream);
 
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) audioChunksRef.current.push(event.data);
-      };
+    mediaRecorderRef.current = recorder;
+    audioChunksRef.current = [];
 
-      mediaRecorder.onstop = processAudio;
-      mediaRecorder.start();
-      setIsRecording(true);
-    } catch (error) {
-      alert("Please allow microphone access to use this feature.");
-    }
+    recorder.ondataavailable = (e) => {
+      if (e.data.size > 0) audioChunksRef.current.push(e.data);
+    };
+
+    recorder.onstop = processAudio;
+    recorder.start();
+    setIsRecording(true);
   };
 
   const stopRecording = () => {
-    if (mediaRecorderRef.current) {
-      mediaRecorderRef.current.stop();
-      setIsRecording(false);
-      mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
-    }
+    mediaRecorderRef.current?.stop();
+    setIsRecording(false);
+    mediaRecorderRef.current.stream.getTracks().forEach((t) => t.stop());
   };
 
+  // ================= PROCESS =================
   const processAudio = async () => {
     setIsProcessing(true);
-    const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-    const audioFile = new File([audioBlob], "recording.webm", { type: 'audio/webm' });
+
+    const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+    const file = new File([blob], "recording.webm");
 
     const formData = new FormData();
-    formData.append("audio", audioFile);
+    formData.append("audio", file);
     formData.append("jobDescription", jobDescription);
-    formData.append("resumeText", resumeText); 
-    
-    const historyForAPI = messages
-      .filter((m, idx) => idx !== 0) 
-      .map(m => ({
-        role: m.role === 'ai' ? 'assistant' : 'user',
-        content: m.text
-      }));
-      
-    formData.append("history", JSON.stringify(historyForAPI));
+    formData.append("resumeText", resumeText);
+
+    const history = messages.map((m) => ({
+      role: m.role === "ai" ? "assistant" : "user",
+      content: m.text,
+    }));
+
+    formData.append("history", JSON.stringify(history));
 
     try {
-      const response = await fetch('/api/interview/audio', {
-        method: 'POST',
+      const res = await fetch("/api/interview/audio", {
+        method: "POST",
         body: formData,
       });
-      const data = await response.json();
 
-      if (data.error) throw new Error(data.error);
+      const data = await res.json();
 
-      setMessages(prev => [
-        ...prev, 
-        { role: 'user', text: data.userText },
-        { role: 'ai', text: data.aiText }
+      setMessages((prev) => [
+        ...prev,
+        { role: "user", text: data.userText },
+        { role: "ai", text: data.aiText },
       ]);
 
       if (data.audioBase64) {
-        const audioDataUrl = `data:audio/mp3;base64,${data.audioBase64}`;
-        const audio = new Audio(audioDataUrl);
-        audio.play();
+        new Audio(`data:audio/mp3;base64,${data.audioBase64}`).play();
       }
-
-    } catch (error) {
-      console.error("Failed to process:", error);
-      alert("Something went wrong with the AI processing.");
+    } catch (err) {
+      alert("Error processing audio");
     } finally {
       setIsProcessing(false);
     }
   };
 
-  // UI Phase 1: Setup
+  // ================= EVALUATE =================
+  const handleEndInterview = async () => {
+    setIsEvaluating(true);
+
+    const history = messages.map((m) => ({
+      role: m.role === "ai" ? "Interviewer" : "Candidate",
+      content: m.text,
+    }));
+
+    try {
+      const data = await evaluateVoiceInterview(history, jobDescription);
+      setResults(data);
+    } catch {
+      alert("Evaluation failed");
+    } finally {
+      setIsEvaluating(false);
+    }
+  };
+
+  // ================= SETUP UI =================
   if (!isSetupComplete) {
     return (
       <div className="container mx-auto py-10 max-w-2xl">
-        <h1 className="text-3xl font-bold mb-2">Configure Mock Interview</h1>
-        <p className="text-muted-foreground mb-8">Provide the job details and your resume so the AI can tailor your interview questions.</p>
-
-        <Card>
+        <Card className="border border-white/10">
           <CardHeader>
             <CardTitle>Interview Context</CardTitle>
           </CardHeader>
+
           <CardContent className="space-y-6">
-            <div className="space-y-2">
-              <Label>Target Job Description</Label>
-              <Textarea 
-                placeholder="Paste the requirements and responsibilities of the job you want..." 
+            <div>
+              <Label>Job Description</Label>
+              <Textarea
                 className="min-h-[150px]"
                 value={jobDescription}
                 onChange={(e) => setJobDescription(e.target.value)}
               />
             </div>
-            
-            <div className="space-y-2">
-              <Label>Upload Resume (PDF)</Label>
-              <div className="border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center text-muted-foreground bg-slate-50 hover:bg-slate-100 transition-colors">
-                <UploadCloud className="h-8 w-8 mb-2" />
-                <Input 
-                  type="file" 
-                  accept=".pdf" 
-                  className="max-w-[250px]"
+
+            <div>
+              <Label>Resume</Label>
+              <div className="border-2 border-dashed p-6 rounded-lg text-center">
+                <UploadCloud className="mx-auto mb-2" />
+                <Input
+                  type="file"
+                  accept=".pdf"
                   onChange={(e) => setResumeFile(e.target.files[0])}
                 />
-                <p className="text-sm mt-2">Only PDF files are supported</p>
               </div>
             </div>
 
-            <Button className="w-full" size="lg" onClick={handleStartInterview} disabled={isParsingPdf}>
-              {isParsingPdf ? (
-                <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Preparing Interview Engine...</>
-              ) : (
-                <><Play className="mr-2 h-5 w-5" /> Start Interview</>
-              )}
+            <Button onClick={handleStartInterview}>
+              {isParsingPdf ? "Preparing..." : "Start Interview"}
             </Button>
           </CardContent>
         </Card>
@@ -174,54 +195,130 @@ export default function VoiceInterviewPage() {
     );
   }
 
-  // UI Phase 2: The Interview
+  // ================= RESULTS =================
+  if (results) {
+    return (
+      <div className="container mx-auto py-10 max-w-3xl">
+
+        <div className="text-center mb-8">
+          <CheckCircle2 className="h-16 w-16 text-green-500 mx-auto mb-4" />
+          <h1 className="text-3xl font-bold">Interview Complete</h1>
+        </div>
+
+        {/* SCORES + METRICS INSIDE */}
+        <div className="grid grid-cols-3 gap-4 mb-6">
+
+          {/* OVERALL */}
+          <Card className="p-4 text-center border border-white/10">
+            <p className="text-sm text-muted-foreground">Overall</p>
+            <p className="text-3xl font-bold mb-2">
+              {results.scores.overall}/10
+            </p>
+          </Card>
+
+          {/* TECHNICAL */}
+          <Card className="p-4 border border-white/10">
+            <p className="text-sm text-muted-foreground text-center">Technical</p>
+            <p className="text-3xl font-bold text-center mb-2">
+              {results.scores.technical}/10
+            </p>
+
+            <ul className="text-xs space-y-1 text-muted-foreground">
+              {results.keyMetrics?.slice(0, 2).map((m, i) => (
+                <li key={i}>• {m}</li>
+              ))}
+            </ul>
+          </Card>
+
+          {/* COMMUNICATION */}
+          <Card className="p-4 border border-white/10">
+            <p className="text-sm text-muted-foreground text-center">Communication</p>
+            <p className="text-3xl font-bold text-center mb-2">
+              {results.scores.communication}/10
+            </p>
+
+            <ul className="text-xs space-y-1 text-muted-foreground">
+              {results.keyMetrics?.slice(2, 4).map((m, i) => (
+                <li key={i}>• {m}</li>
+              ))}
+            </ul>
+          </Card>
+
+        </div>
+
+        {/* FEEDBACK */}
+        <Card className="mb-6 border border-white/10">
+          <CardHeader>
+            <CardTitle>Feedback</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="leading-relaxed whitespace-pre-wrap break-words">
+              {results.feedback}
+            </p>
+          </CardContent>
+        </Card>
+
+        {/* RESET BUTTON */}
+        <div className="mt-8 flex justify-center">
+          <Button onClick={resetInterview}>
+            Start New Interview
+          </Button>
+        </div>
+
+      </div>
+    );
+  }
+
+  const canEndInterview = messages.length >= 8;
+
+  // ================= INTERVIEW =================
   return (
     <div className="container mx-auto py-10 max-w-3xl">
-      <h1 className="text-3xl font-bold mb-2">Live Interview</h1>
-      <p className="text-muted-foreground mb-8">Speak clearly. The AI is analyzing your answers against the provided job description.</p>
+      <div className="flex justify-between mb-6">
+        <h1 className="text-3xl font-bold">Live Interview</h1>
 
-      <Card className="mb-6 border-primary/20 shadow-md">
-        <CardHeader className="bg-muted/50 border-b">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Volume2 className="h-5 w-5 text-primary" /> Interview Transcript
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="h-[400px] overflow-y-auto flex flex-col space-y-4 p-6">
-          {messages.map((msg, idx) => (
-            <div 
-              key={idx} 
+        <Button
+          onClick={handleEndInterview}
+          disabled={!canEndInterview || isEvaluating}
+        >
+          {isEvaluating ? "Evaluating..." : "End Interview"}
+        </Button>
+      </div>
+
+      <Card className="border border-white/10">
+        <CardContent className="h-[400px] overflow-y-auto flex flex-col gap-4 p-6">
+          {messages.map((msg, i) => (
+            <div
+              key={i}
               className={`p-4 rounded-xl max-w-[85%] ${
-                msg.role === 'ai' 
-                  ? 'bg-muted text-foreground self-start rounded-tl-none' 
-                  : 'bg-primary text-primary-foreground self-end rounded-tr-none'
+                msg.role === "ai"
+                  ? "bg-muted self-start"
+                  : "bg-primary text-primary-foreground self-end"
               }`}
             >
-              <div className="flex items-center gap-2 mb-1 opacity-70">
-                {msg.role === 'ai' ? <Volume2 className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-                <span className="font-semibold text-xs uppercase tracking-wider">
-                  {msg.role === 'ai' ? 'Interviewer' : 'You'}
-                </span>
-              </div>
-              <p className="leading-relaxed">{msg.text}</p>
+              <p className="leading-relaxed whitespace-pre-wrap break-words">
+                {msg.text}
+              </p>
             </div>
           ))}
+
           {isProcessing && (
-            <div className="flex items-center gap-3 text-muted-foreground p-4 bg-muted rounded-xl self-start max-w-[50%]">
-              <Loader2 className="h-4 w-4 animate-spin text-primary" /> 
-              <span className="text-sm">Interviewer is analyzing...</span>
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Loader2 className="animate-spin h-4 w-4" />
+              Processing...
             </div>
           )}
         </CardContent>
       </Card>
 
-      <div className="flex justify-center gap-4">
+      <div className="flex justify-center mt-6">
         {!isRecording ? (
-          <Button size="lg" className="rounded-full px-8 h-14" onClick={startRecording} disabled={isProcessing}>
-            <Mic className="mr-2 h-5 w-5" /> Tap to Speak
+          <Button onClick={startRecording}>
+            <Mic className="mr-2" /> Speak
           </Button>
         ) : (
-          <Button size="lg" variant="destructive" className="rounded-full px-8 h-14 animate-pulse" onClick={stopRecording}>
-            <Square className="mr-2 h-5 w-5" /> Stop & Submit Answer
+          <Button variant="destructive" onClick={stopRecording}>
+            <Square className="mr-2 animate-pulse" /> Recording...
           </Button>
         )}
       </div>

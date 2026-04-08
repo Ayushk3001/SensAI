@@ -2,30 +2,29 @@
 
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import OpenAI from "openai";
 import { revalidatePath } from "next/cache";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 export async function saveResume(content) {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
-
-  const user = await db.user.findUnique({
-    where: { clerkUserId: userId },
-  });
-
-  if (!user) throw new Error("User not found");
-
   try {
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+
+    if (!content) throw new Error("Content is required");
+
+    const user = await db.user.findUnique({
+      where: { clerkUserId: userId },
+    });
+
+    if (!user) throw new Error("User not found");
+
     const resume = await db.resume.upsert({
-      where: {
-        userId: user.id,
-      },
-      update: {
-        content,
-      },
+      where: { userId: user.id },
+      update: { content },
       create: {
         userId: user.id,
         content,
@@ -35,64 +34,80 @@ export async function saveResume(content) {
     revalidatePath("/resume");
     return resume;
   } catch (error) {
-    console.error("Error saving resume:", error);
+    console.error("Save Resume Error:", error);
     throw new Error("Failed to save resume");
   }
 }
 
 export async function getResume() {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
+  try {
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
 
-  const user = await db.user.findUnique({
-    where: { clerkUserId: userId },
-  });
+    const user = await db.user.findUnique({
+      where: { clerkUserId: userId },
+    });
 
-  if (!user) throw new Error("User not found");
+    if (!user) throw new Error("User not found");
 
-  return await db.resume.findUnique({
-    where: {
-      userId: user.id,
-    },
-  });
+    return await db.resume.findUnique({
+      where: { userId: user.id },
+    });
+  } catch (error) {
+    console.error("Get Resume Error:", error);
+    throw new Error("Failed to fetch resume");
+  }
 }
 
 export async function improveWithAI({ current, type }) {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
-
-  const user = await db.user.findUnique({
-    where: { clerkUserId: userId },
-    include: {
-      industryInsight: true,
-    },
-  });
-
-  if (!user) throw new Error("User not found");
-
-  const prompt = `
-    As an expert resume writer, improve the following ${type} description for a ${user.industry} professional.
-    Make it more impactful, quantifiable, and aligned with industry standards.
-    Current content: "${current}"
-
-    Requirements:
-    1. Use action verbs
-    2. Include metrics and results where possible
-    3. Highlight relevant technical skills
-    4. Keep it concise but detailed
-    5. Focus on achievements over responsibilities
-    6. Use industry-specific keywords
-    
-    Format the response as a single paragraph without any additional text or explanations.
-  `;
-
   try {
-    const result = await model.generateContent(prompt);
-    const response = result.response;
-    const improvedContent = response.text().trim();
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+
+    if (!current || !type) {
+      throw new Error("Missing required fields");
+    }
+
+    const user = await db.user.findUnique({
+      where: { clerkUserId: userId },
+      include: { industryInsight: true },
+    });
+
+    if (!user) throw new Error("User not found");
+
+    const prompt = `
+As an expert resume writer, improve the following ${type} description for a ${user.industry || "general"} professional.
+
+Make it impactful, quantifiable, and aligned with industry standards.
+
+Current content:
+"${current}"
+
+Requirements:
+- Use strong action verbs
+- Add measurable results (numbers, %, impact)
+- Highlight relevant technical skills
+- Focus on achievements, not responsibilities
+- Use industry-specific keywords
+- Keep it concise
+
+Return ONLY the improved paragraph. No explanations.
+`;
+
+    const response = await openai.responses.create({
+      model: "gpt-5-nano",
+      input: prompt,
+    });
+
+    const improvedContent = response.output_text?.trim();
+
+    if (!improvedContent) {
+      throw new Error("Empty response from AI");
+    }
+
     return improvedContent;
   } catch (error) {
-    console.error("Error improving content:", error);
+    console.error("Improve Resume Error:", error);
     throw new Error("Failed to improve content");
   }
 }

@@ -169,39 +169,63 @@ export async function getAssessments() {
 }
 
 
-export async function evaluateVoiceInterview(history, jobDescription) {
-  const { userId } = await auth();
+export async function evaluateVoiceInterview(history, jobDescription, interviewType = "technical") {
+  const { userId } = await auth(); // Make sure your auth import is still at the top of the file
   if (!userId) throw new Error("Unauthorized");
 
+  // 1. Set dynamic grading rules based on the chosen interview type
+  let evaluationCriteria = "";
+  let competencyLabel = "";
+
+  if (interviewType === "technical") {
+    evaluationCriteria = "technical accuracy, problem-solving skills, system design, and coding concepts";
+    competencyLabel = "Technical Skills";
+  } else if (interviewType === "hr") {
+    evaluationCriteria = "cultural fit, behavioral alignment, self-awareness, and use of the STAR method";
+    competencyLabel = "Behavioral & Cultural Fit";
+  } else if (interviewType === "aptitude") {
+    evaluationCriteria = "logical reasoning, analytical thinking, mental agility, and mathematical approach";
+    competencyLabel = "Logical & Analytical Ability";
+  } else if (interviewType === "managerial") {
+    evaluationCriteria = "leadership, decision-making, conflict resolution, and task prioritization under stress";
+    competencyLabel = "Managerial & Leadership Skills";
+  }
+
+  // 2. Create the dynamic prompt
   const prompt = `
-    You are an expert technical interviewer. Review the following transcript of a mock voice interview for the following job description:
+    You are an expert evaluator for a ${interviewType.toUpperCase()} interview. 
+    Review the following transcript of a mock voice interview for the following job description:
     
     Job Description: ${jobDescription}
 
     Interview Transcript:
     ${history.map(m => `${m.role.toUpperCase()}: ${m.content}`).join('\n')}
 
-    Evaluate the candidate's performance based on technical accuracy, communication clarity, and behavioral alignment.
+    Evaluate the candidate's performance heavily based on: ${evaluationCriteria}, as well as their general communication clarity.
     
     Return the response in this JSON format ONLY:
     {
       "scores": {
-        "technical": <number 1-10>,
+        "competency": <number 1-10>,
         "communication": <number 1-10>,
         "overall": <number 1-10>
       },
-      "feedback": "A concise paragraph summarizing strengths and areas for improvement",
-      "keyMetrics": ["<metric 1>", "<metric 2>", "<metric 3>"]
+      "feedback": "A concise paragraph summarizing their strengths and specific areas for improvement regarding their ${competencyLabel}.",
+      "keyMetrics": ["<metric 1>", "<metric 2>", "<metric 3>", "<metric 4>"]
     }
+    
+    IMPORTANT: 
+    - The 'competency' score reflects how well they did specifically in ${competencyLabel}. 
+    - The 'keyMetrics' MUST explicitly relate to the skills tested in a ${interviewType} interview (e.g., do not mention coding metrics if it is an HR interview).
   `;
 
   try {
     const completion = await openai.chat.completions.create({
-      model: "gpt-5-nano", // Using the same model as your audio route
+      model: "gpt-5-nano", // Matched this to your audio route model for consistency
       messages: [
         {
           role: "system",
-          content: "You are a technical evaluator. Output only valid JSON.",
+          content: "You are an expert interview evaluator. Output only valid JSON.",
         },
         { role: "user", content: prompt },
       ],

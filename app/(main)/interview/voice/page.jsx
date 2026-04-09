@@ -7,6 +7,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 import {
   Mic,
@@ -25,6 +32,9 @@ export default function VoiceInterviewPage() {
   const [resumeFile, setResumeFile] = useState(null);
   const [resumeText, setResumeText] = useState("");
   const [isParsingPdf, setIsParsingPdf] = useState(false);
+  
+  // State for Interview Type
+  const [interviewType, setInterviewType] = useState("technical");
 
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -44,6 +54,7 @@ export default function VoiceInterviewPage() {
     setJobDescription("");
     setResumeFile(null);
     setResumeText("");
+    setInterviewType("technical");
   };
 
   // ================= SETUP =================
@@ -62,7 +73,7 @@ export default function VoiceInterviewPage() {
       setMessages([
         {
           role: "ai",
-          text: "I've had a look at your resume. Feel free to introduce yourself whenever you're ready",
+          text: `Welcome! I will be conducting your ${interviewType} interview today. I've had a look at your resume. Feel free to introduce yourself whenever you're ready.`,
         },
       ]);
     } finally {
@@ -104,6 +115,7 @@ export default function VoiceInterviewPage() {
     formData.append("audio", file);
     formData.append("jobDescription", jobDescription);
     formData.append("resumeText", resumeText);
+    formData.append("interviewType", interviewType);
 
     const history = messages.map((m) => ({
       role: m.role === "ai" ? "assistant" : "user",
@@ -146,7 +158,8 @@ export default function VoiceInterviewPage() {
     }));
 
     try {
-      const data = await evaluateVoiceInterview(history, jobDescription);
+      // Passes the selected interview type to the backend
+      const data = await evaluateVoiceInterview(history, jobDescription, interviewType);
       setResults(data);
     } catch {
       alert("Evaluation failed");
@@ -165,10 +178,26 @@ export default function VoiceInterviewPage() {
           </CardHeader>
 
           <CardContent className="space-y-6">
+            
+            <div>
+              <Label>Interview Type</Label>
+              <Select value={interviewType} onValueChange={setInterviewType}>
+                <SelectTrigger className="w-full mt-1">
+                  <SelectValue placeholder="Select interview type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="technical">1. Technical Interview</SelectItem>
+                  <SelectItem value="hr">2. HR / Behavioral Interview</SelectItem>
+                  <SelectItem value="aptitude">3. Aptitude / Logical Interview</SelectItem>
+                  <SelectItem value="managerial">4. Managerial / Situational Interview</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
             <div>
               <Label>Job Description</Label>
               <Textarea
-                className="min-h-[150px]"
+                className="min-h-[150px] mt-1"
                 value={jobDescription}
                 onChange={(e) => setJobDescription(e.target.value)}
               />
@@ -176,7 +205,7 @@ export default function VoiceInterviewPage() {
 
             <div>
               <Label>Resume</Label>
-              <div className="border-2 border-dashed p-6 rounded-lg text-center">
+              <div className="border-2 border-dashed p-6 rounded-lg text-center mt-1">
                 <UploadCloud className="mx-auto mb-2" />
                 <Input
                   type="file"
@@ -186,7 +215,7 @@ export default function VoiceInterviewPage() {
               </div>
             </div>
 
-            <Button onClick={handleStartInterview}>
+            <Button onClick={handleStartInterview} className="w-full">
               {isParsingPdf ? "Preparing..." : "Start Interview"}
             </Button>
           </CardContent>
@@ -205,7 +234,6 @@ export default function VoiceInterviewPage() {
           <h1 className="text-3xl font-bold">Interview Complete</h1>
         </div>
 
-        {/* SCORES + METRICS INSIDE */}
         <div className="grid grid-cols-3 gap-4 mb-6">
 
           {/* OVERALL */}
@@ -216,11 +244,15 @@ export default function VoiceInterviewPage() {
             </p>
           </Card>
 
-          {/* TECHNICAL */}
+          {/* DYNAMIC COMPETENCY BOX (This is the fix!) */}
           <Card className="p-4 border border-white/10">
-            <p className="text-sm text-muted-foreground text-center">Technical</p>
+            <p className="text-sm text-muted-foreground text-center capitalize">
+              {interviewType === "hr" ? "Behavioral" : 
+               interviewType === "aptitude" ? "Logical" : 
+               interviewType === "managerial" ? "Managerial" : "Technical"} Skill
+            </p>
             <p className="text-3xl font-bold text-center mb-2">
-              {results.scores.technical}/10
+              {results.scores.competency || results.scores.technical}/10
             </p>
 
             <ul className="text-xs space-y-1 text-muted-foreground">
@@ -258,7 +290,6 @@ export default function VoiceInterviewPage() {
           </CardContent>
         </Card>
 
-        {/* RESET BUTTON */}
         <div className="mt-8 flex justify-center">
           <Button onClick={resetInterview}>
             Start New Interview

@@ -14,7 +14,7 @@ export const howItWorks = [
   {
     title: "Prepare for Interviews",
     description:
-      "Practice with AI-powered mock interviews tailored to your role",
+      "Practice with AI-powered mock and voice interviews tailored to your role",
     icon: <Users className="w-8 h-8 text-primary" />,
   },
   {

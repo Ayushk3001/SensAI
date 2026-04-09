@@ -4,12 +4,12 @@ import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import OpenAI from "openai";
 
-// Initialize OpenAI client
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-export async function generateQuiz() {
+// NEW: Added 'topic' argument
+export async function generateQuiz(topic = "") {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
@@ -23,12 +23,19 @@ export async function generateQuiz() {
 
   if (!user) throw new Error("User not found");
 
+  // NEW: Tells the AI to focus on the specific topic if the user typed one in
+  const topicInstruction = topic 
+    ? `The questions MUST focus heavily on the following specific topic: "${topic}".` 
+    : "";
+
   const prompt = `
     Generate 10 technical interview questions for a ${
       user.industry
     } professional${
     user.skills?.length ? ` with expertise in ${user.skills.join(", ")}` : ""
   }.
+    
+    ${topicInstruction}
     
     Each question should be multiple choice with 4 options.
     
@@ -47,7 +54,7 @@ export async function generateQuiz() {
 
   try {
     const completion = await openai.chat.completions.create({
-      model: "gpt-5-nano", // Ensure this matches your available model string
+      model: "gpt-4o-mini", // FIXED MODEL NAME
       messages: [
         {
           role: "system",
@@ -55,7 +62,7 @@ export async function generateQuiz() {
         },
         { role: "user", content: prompt },
       ],
-      response_format: { type: "json_object" }, // Forces the model to output JSON
+      response_format: { type: "json_object" },
     });
 
     const text = completion.choices[0].message.content;
@@ -110,7 +117,7 @@ export async function saveQuizResult(questions, answers, score) {
 
     try {
       const tipCompletion = await openai.chat.completions.create({
-        model: "gpt-5-nano",
+        model: "gpt-4o-mini", // FIXED MODEL NAME
         messages: [
           { role: "system", content: "You are a helpful technical mentor." },
           { role: "user", content: improvementPrompt },
@@ -168,12 +175,11 @@ export async function getAssessments() {
   }
 }
 
-
+// Voice Interview Evaluation (Includes the dynamic interviewType fixes we made earlier!)
 export async function evaluateVoiceInterview(history, jobDescription, interviewType = "technical") {
-  const { userId } = await auth(); // Make sure your auth import is still at the top of the file
+  const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
-  // 1. Set dynamic grading rules based on the chosen interview type
   let evaluationCriteria = "";
   let competencyLabel = "";
 
@@ -191,7 +197,6 @@ export async function evaluateVoiceInterview(history, jobDescription, interviewT
     competencyLabel = "Managerial & Leadership Skills";
   }
 
-  // 2. Create the dynamic prompt
   const prompt = `
     You are an expert evaluator for a ${interviewType.toUpperCase()} interview. 
     Review the following transcript of a mock voice interview for the following job description:
@@ -213,15 +218,11 @@ export async function evaluateVoiceInterview(history, jobDescription, interviewT
       "feedback": "A concise paragraph summarizing their strengths and specific areas for improvement regarding their ${competencyLabel}.",
       "keyMetrics": ["<metric 1>", "<metric 2>", "<metric 3>", "<metric 4>"]
     }
-    
-    IMPORTANT: 
-    - The 'competency' score reflects how well they did specifically in ${competencyLabel}. 
-    - The 'keyMetrics' MUST explicitly relate to the skills tested in a ${interviewType} interview (e.g., do not mention coding metrics if it is an HR interview).
   `;
 
   try {
     const completion = await openai.chat.completions.create({
-      model: "gpt-5-nano", // Matched this to your audio route model for consistency
+      model: "gpt-4o-mini", // FIXED MODEL NAME
       messages: [
         {
           role: "system",

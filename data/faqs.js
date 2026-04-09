@@ -1,32 +1,32 @@
 export const faqs = [
   {
-    question: "What makes Sensai unique as a career development tool?",
+    question: "What exactly is SensAI, and how can it get me hired?",
     answer:
-      "Sensai combines AI-powered career tools with industry-specific insights to help you advance your career. Our platform offers three main features: an intelligent resume builder, a cover letter generator, and an adaptive interview preparation system. Each tool is tailored to your industry and skills, providing personalized guidance for your professional journey.",
+      "Think of SensAI as your personal, 24/7 career coach. Instead of just giving you generic templates, we use advanced AI to build ATS-optimized resumes, generate tailored cover letters, map out custom learning roadmaps, and even conduct live voice interviews to get you 100% ready for your dream job.",
   },
   {
-    question: "How does Sensai create tailored content?",
+    question: "Wait, I can practice interviews with an actual AI voice?",
     answer:
-      "Sensai learns about your industry, experience, and skills during onboarding. It then uses this information to generate customized resumes, cover letters, and interview questions. The content is specifically aligned with your professional background and industry standards, making it highly relevant and effective.",
+      "Yep! SensAI features a live AI voice interviewer that actually listens to your answers and responds in real-time. You can practice Technical coding rounds, Behavioral (HR) questions, Aptitude tests, or Managerial scenarios, and get instant feedback on your performance.",
   },
   {
-    question: "How accurate and up-to-date are Sensai's industry insights?",
+    question: "Are the resumes and cover letters just generic templates?",
     answer:
-      "We update our industry insights weekly using advanced AI analysis of current market trends. This includes salary data, in-demand skills, and industry growth patterns. Our system constantly evolves to ensure you have the most relevant information for your career decisions.",
+      "Not at all. SensAI acts like an expert recruiter. It learns about your specific industry, skills, and experience level to generate highly targeted content. Plus, our 'Job Match Scoring' compares your resume directly to a job description so you know exactly what keywords you are missing.",
   },
   {
-    question: "Is my data secure with Sensai?",
+    question: "I want to learn new skills or switch careers. Can SensAI help me plan that?",
     answer:
-      "Absolutely. We prioritize the security of your professional information. All data is encrypted and securely stored using industry-standard practices. We use Clerk for authentication and never share your personal information with third parties.",
+      "Absolutely! That is where our Custom Learning Roadmaps come in. Just tell SensAI your end goal, and it will generate a step-by-step, personalized timeline with milestones to help you learn the exact skills you need to transition successfully.",
   },
   {
-    question: "How can I track my interview preparation progress?",
+    question: "Is my personal data safe, or are the robots selling it?",
     answer:
-      "Sensai tracks your performance across multiple practice interviews, providing detailed analytics and improvement suggestions. You can view your progress over time, identify areas for improvement, and receive AI-generated tips to enhance your interview skills based on your responses.",
+      "Your secrets are safe with us! We take your privacy very seriously. All your professional data, resumes, and interview transcripts are encrypted and securely stored. We use industry-leading authentication and never share or sell your personal information to third parties.",
   },
   {
-    question: "Can I edit the AI-generated content?",
+    question: "What if the AI writes something I want to change?",
     answer:
-      "Yes! While Sensai generates high-quality initial content, you have full control to edit and customize all generated resumes, cover letters, and other content. Our markdown editor makes it easy to refine the content to perfectly match your needs.",
+      "You are always in the driver's seat. While our AI generates incredibly high-quality drafts, you have full control to edit, tweak, and customize every single word of your resumes, cover letters, and profiles using our built-in editor before you download them.",
   },
 ];

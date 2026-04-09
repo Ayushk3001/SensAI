@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation"; 
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,15 +13,18 @@ import {
 } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { generateQuiz, saveQuizResult } from "@/actions/interview";
 import QuizResult from "./quiz-result";
 import useFetch from "@/hooks/use-fetch";
 import { BarLoader } from "react-spinners";
 
 export default function Quiz() {
+  const router = useRouter(); 
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState([]);
   const [showExplanation, setShowExplanation] = useState(false);
+  const [topic, setTopic] = useState(""); 
 
   const {
     loading: generatingQuiz,
@@ -76,41 +80,92 @@ export default function Quiz() {
     }
   };
 
-  const startNewQuiz = () => {
+  // Retake same topic
+  const retakeSameTopic = () => {
     setCurrentQuestion(0);
     setAnswers([]);
     setShowExplanation(false);
-    generateQuizFn();
     setResultData(null);
+    generateQuizFn(topic);
+  };
+
+  const handleStartQuiz = () => {
+    generateQuizFn(topic); 
   };
 
   if (generatingQuiz) {
     return <BarLoader className="mt-4" width={"100%"} color="gray" />;
   }
 
-  // Show results if quiz is completed
+  // ================= RESULTS SCREEN =================
   if (resultData) {
     return (
-      <div className="mx-2">
-        <QuizResult result={resultData} onStartNew={startNewQuiz} />
+      <div className="mx-2 space-y-4">
+        <QuizResult result={resultData} hideStartNew={true} />
+        
+        <Card className="border-primary/20">
+          <CardHeader>
+            <CardTitle className="text-center text-xl">
+              Ready for another round?
+            </CardTitle>
+          </CardHeader>
+
+          <CardContent className="flex flex-col sm:flex-row gap-4 justify-center">
+            
+            {/* Only Retake Same Topic */}
+            <Button 
+              size="lg"
+              className="w-full sm:w-auto font-semibold" 
+              onClick={retakeSameTopic}
+            >
+              Retake {topic ? `Same Topic (${topic})` : "General Quiz"}
+            </Button>
+
+          </CardContent>
+          
+          <CardFooter>
+            <Button 
+              variant="ghost" 
+              className="w-full text-muted-foreground hover:text-primary" 
+              onClick={() => router.push("/interview")}
+            >
+              Return to Interview Insights
+            </Button>
+          </CardFooter>
+        </Card>
       </div>
     );
   }
 
+  // ================= START SCREEN =================
   if (!quizData) {
     return (
       <Card className="mx-2">
         <CardHeader>
           <CardTitle>Ready to test your knowledge?</CardTitle>
         </CardHeader>
-        <CardContent>
+
+        <CardContent className="space-y-6">
           <p className="text-muted-foreground">
-            This quiz contains 10 questions specific to your industry and
-            skills. Take your time and choose the best answer for each question.
+            This quiz contains 10 technical questions. You can generate a general quiz based on your profile, or type a specific topic below to focus your practice.
           </p>
+
+          <div className="space-y-2">
+            <Label htmlFor="topic">Specific Topic (Optional)</Label>
+            <Input
+              id="topic"
+              placeholder="e.g., React hooks, System Design, Python loops..."
+              value={topic}
+              onChange={(e) => setTopic(e.target.value)}
+            />
+            <p className="text-xs text-muted-foreground">
+              Leave blank to get general questions about your industry.
+            </p>
+          </div>
         </CardContent>
+
         <CardFooter>
-          <Button onClick={generateQuizFn} className="w-full">
+          <Button onClick={handleStartQuiz} className="w-full">
             Start Quiz
           </Button>
         </CardFooter>
@@ -120,6 +175,7 @@ export default function Quiz() {
 
   const question = quizData[currentQuestion];
 
+  // ================= LIVE QUIZ SCREEN =================
   return (
     <Card className="mx-2">
       <CardHeader>
@@ -127,8 +183,10 @@ export default function Quiz() {
           Question {currentQuestion + 1} of {quizData.length}
         </CardTitle>
       </CardHeader>
+
       <CardContent className="space-y-4">
         <p className="text-lg font-medium">{question.question}</p>
+
         <RadioGroup
           onValueChange={handleAnswer}
           value={answers[currentQuestion]}
@@ -149,6 +207,7 @@ export default function Quiz() {
           </div>
         )}
       </CardContent>
+
       <CardFooter className="flex justify-between">
         {!showExplanation && (
           <Button
@@ -159,6 +218,7 @@ export default function Quiz() {
             Show Explanation
           </Button>
         )}
+
         <Button
           onClick={handleNext}
           disabled={!answers[currentQuestion] || savingResult}

@@ -30,6 +30,7 @@ export async function POST(req) {
       interviewInstructions = `
       PURPOSE: Test technical skills. 
       - Ask about coding concepts which is based on the skill in resume.
+      - Ask a Question about Data Structure and Algorithm.
       - Ask problem-solving questions.
       - Ask about system design (basic/advanced depending on their resume).
       - Base the questions heavily on the technologies listed in their resume and the job description.`;

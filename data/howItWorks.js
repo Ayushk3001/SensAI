@@ -1,5 +1,4 @@
-import { UserPlus, FileEdit, Users, LineChart } from "lucide-react";
-
+import { UserPlus, FileEdit, Users, LineChart, Map, TrendingUp } from "lucide-react";
 export const howItWorks = [
   {
     title: "Professional Onboarding",
@@ -21,5 +20,16 @@ export const howItWorks = [
     title: "Track Your Progress",
     description: "Monitor improvements with detailed performance analytics",
     icon: <LineChart className="w-8 h-8 text-primary" />,
+  },
+
+  {
+    title: "Map Your Roadmap",
+    description: "Receive a personalized step-by-step career path with curated milestones and learning resources.",
+    icon: <Map size={48} />,
+  },
+  {
+    title: "Industrial Insights",
+    description: "Stay ahead with real-time data on market trends, salary benchmarks, and in-demand skills.",
+    icon: <TrendingUp size={48} />,
   },
 ];

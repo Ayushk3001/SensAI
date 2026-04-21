@@ -1,68 +1,93 @@
 "use client";
 
-import { Trophy, CheckCircle2, XCircle } from "lucide-react";
+import { Trophy, CheckCircle2, XCircle, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CardContent, CardFooter } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 
-export default function QuizResult({
-  result,
-  hideStartNew = false,
-  onStartNew,
-}) {
+export default function QuizResult({ result, hideStartNew = false, onStartNew }) {
   if (!result) return null;
 
-  return (
-    <div className="mx-auto">
-      <h1 className="flex items-center gap-2 text-3xl gradient-title">
-        <Trophy className="h-6 w-6 text-yellow-500" />
-        Quiz Results
-      </h1>
+  const score = result.quizScore;
 
-      <CardContent className="space-y-6">
-        {/* Score Overview */}
-        <div className="text-center space-y-2">
-          <h3 className="text-2xl font-bold">{result.quizScore.toFixed(1)}%</h3>
-          <Progress value={result.quizScore} className="w-full" />
+  return (
+    <div className="mx-auto max-w-3xl">
+      {/* Header */}
+      <div className="flex items-center justify-center gap-3 mb-8">
+        <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-yellow-500 rounded-3xl flex items-center justify-center shadow-xl">
+          <Trophy className="h-7 w-7 text-white" />
+        </div>
+        <h1 className="text-4xl font-bold tracking-tighter bg-gradient-to-r from-white to-amber-300 bg-clip-text text-transparent">
+          Quiz Complete
+        </h1>
+      </div>
+
+      <CardContent className="space-y-8 bg-card/80 border border-border/50 rounded-3xl p-8">
+        {/* Score */}
+        <div className="text-center">
+          <div className="inline-flex items-center justify-center w-28 h-28 rounded-3xl bg-gradient-to-br from-purple-500 to-pink-500 text-white text-5xl font-bold shadow-inner mb-4">
+            {score.toFixed(1)}
+            <span className="text-2xl font-normal ml-1">%</span>
+          </div>
+          <Progress value={score} className="h-3 w-80 mx-auto" />
         </div>
 
         {/* Improvement Tip */}
         {result.improvementTip && (
-          <div className="bg-muted p-4 rounded-lg">
-            <p className="font-medium">Improvement Tip:</p>
-            <p className="text-muted-foreground">{result.improvementTip}</p>
+          <div className="bg-zinc-900/70 border border-zinc-700 rounded-2xl p-6">
+            <p className="font-semibold text-amber-300 mb-2">💡 Improvement Tip</p>
+            <p className="text-zinc-300">{result.improvementTip}</p>
           </div>
         )}
 
-        {/* Questions Review */}
-        <div className="space-y-4">
-          <h3 className="font-medium">Question Review</h3>
-          {result.questions.map((q, index) => (
-            <div key={index} className="border rounded-lg p-4 space-y-2">
-              <div className="flex items-start justify-between gap-2">
-                <p className="font-medium">{q.question}</p>
-                {q.isCorrect ? (
-                  <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0" />
-                ) : (
-                  <XCircle className="h-5 w-5 text-red-500 flex-shrink-0" />
-                )}
+        {/* Question Review */}
+        <div>
+          <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
+            Question Review
+          </h3>
+          <div className="space-y-6">
+            {result.questions.map((q, index) => (
+              <div key={index} className="border border-zinc-700 rounded-2xl p-6 bg-zinc-900/50">
+                <div className="flex justify-between items-start">
+                  <p className="font-medium text-white flex-1">{q.question}</p>
+                  {q.isCorrect ? (
+                    <CheckCircle2 className="h-6 w-6 text-emerald-400 flex-shrink-0" />
+                  ) : (
+                    <XCircle className="h-6 w-6 text-red-400 flex-shrink-0" />
+                  )}
+                </div>
+
+                <div className="mt-6 grid grid-cols-2 gap-6 text-sm">
+                  <div>
+                    <p className="text-zinc-400 text-xs mb-1">YOUR ANSWER</p>
+                    <p className="font-medium text-zinc-200">{q.userAnswer}</p>
+                  </div>
+                  {!q.isCorrect && (
+                    <div>
+                      <p className="text-zinc-400 text-xs mb-1">CORRECT ANSWER</p>
+                      <p className="font-medium text-emerald-300">{q.answer}</p>
+                    </div>
+                  )}
+                </div>
+
+                <div className="mt-6 pt-6 border-t border-zinc-700">
+                  <p className="text-xs uppercase tracking-widest text-zinc-400 mb-2">Explanation</p>
+                  <p className="text-zinc-300 text-sm leading-relaxed">{q.explanation}</p>
+                </div>
               </div>
-              <div className="text-sm text-muted-foreground">
-                <p>Your answer: {q.userAnswer}</p>
-                {!q.isCorrect && <p>Correct answer: {q.answer}</p>}
-              </div>
-              <div className="text-sm bg-muted p-2 rounded">
-                <p className="font-medium">Explanation:</p>
-                <p>{q.explanation}</p>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </CardContent>
 
       {!hideStartNew && (
-        <CardFooter>
-          <Button onClick={onStartNew} className="w-full">
+        <CardFooter className="flex justify-center gap-3 mt-8">
+          <Button
+            onClick={onStartNew}
+            size="lg"
+            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white px-10"
+          >
+            <RotateCcw className="mr-2 h-4 w-4" />
             Start New Quiz
           </Button>
         </CardFooter>

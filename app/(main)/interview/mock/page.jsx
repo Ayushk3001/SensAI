@@ -5,21 +5,23 @@ import Quiz from "../_components/quiz";
 
 export default function MockInterviewPage() {
   return (
-    <div className="container mx-auto space-y-4 py-6">
-      <div className="flex flex-col space-y-2 mx-2">
+    <div className="container mx-auto px-4 py-10 max-w-5xl">
+      <div className="flex items-center gap-3 mb-8">
         <Link href="/interview">
-          <Button variant="link" className="gap-2 pl-0">
+          <Button variant="link" className="pl-0 text-zinc-400 hover:text-white flex items-center gap-2">
             <ArrowLeft className="h-4 w-4" />
-            Back to Interview Preparation
+            Back to Interview Hub
           </Button>
         </Link>
+      </div>
 
-        <div>
-          <h1 className="text-6xl font-bold gradient-title">Mock Interview</h1>
-          <p className="text-muted-foreground">
-            Test your knowledge with industry-specific questions
-          </p>
-        </div>
+      <div className="mb-12">
+        <h1 className="text-6xl font-bold tracking-tighter bg-gradient-to-r from-white via-purple-200 to-white bg-clip-text text-transparent">
+          Mock Interview
+        </h1>
+        <p className="text-xl text-zinc-400 mt-3">
+          Sharpen your skills with AI-generated technical questions
+        </p>
       </div>
 
       <Quiz />

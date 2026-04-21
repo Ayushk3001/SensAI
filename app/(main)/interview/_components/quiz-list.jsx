@@ -25,50 +25,51 @@ export default function QuizList({ assessments }) {
 
   return (
     <>
-      <Card>
+      <Card className="border border-border/50 shadow-xl">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="gradient-title text-3xl md:text-4xl">
+              <CardTitle className="text-3xl font-semibold tracking-tight bg-gradient-to-r from-white to-zinc-300 bg-clip-text text-transparent">
                 Recent Quizzes
               </CardTitle>
-              <CardDescription>
-                Review your past quiz performance
+              <CardDescription className="text-zinc-400">
+                Review your past performance
               </CardDescription>
             </div>
-            <Button onClick={() => router.push("/interview/mock")}>
+            <Button
+              onClick={() => router.push("/interview/mock")}
+              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500"
+            >
               Start New Quiz
             </Button>
           </div>
         </CardHeader>
+
         <CardContent>
-          <div className="space-y-4">
+          <div className="space-y-3">
             {assessments?.map((assessment, i) => (
               <Card
                 key={assessment.id}
-                className="cursor-pointer hover:bg-muted/50 transition-colors"
+                className="cursor-pointer hover:bg-zinc-900/70 border border-transparent hover:border-purple-500/30 transition-all p-4"
                 onClick={() => setSelectedQuiz(assessment)}
               >
-                <CardHeader>
-                  <CardTitle className="gradient-title text-2xl">
-                    Quiz {i + 1}
-                  </CardTitle>
-                  <CardDescription className="flex justify-between w-full">
-                    <div>Score: {assessment.quizScore.toFixed(1)}%</div>
-                    <div>
-                      {format(
-                        new Date(assessment.createdAt),
-                        "MMMM dd, yyyy HH:mm"
-                      )}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-xl">Quiz #{i + 1}</CardTitle>
+                    <CardDescription className="text-zinc-400">
+                      {format(new Date(assessment.createdAt), "MMMM dd, yyyy • HH:mm")}
+                    </CardDescription>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-2xl font-bold text-purple-400">
+                      {assessment.quizScore.toFixed(1)}%
                     </div>
-                  </CardDescription>
-                </CardHeader>
+                  </div>
+                </div>
                 {assessment.improvementTip && (
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground">
-                      {assessment.improvementTip}
-                    </p>
-                  </CardContent>
+                  <p className="text-xs text-zinc-400 mt-4 line-clamp-2">
+                    {assessment.improvementTip}
+                  </p>
                 )}
               </Card>
             ))}
@@ -77,9 +78,9 @@ export default function QuizList({ assessments }) {
       </Card>
 
       <Dialog open={!!selectedQuiz} onOpenChange={() => setSelectedQuiz(null)}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[92vh] overflow-y-auto bg-zinc-950 border-zinc-800">
           <DialogHeader>
-            <DialogTitle></DialogTitle>
+            <DialogTitle className="sr-only">Quiz Result</DialogTitle>
           </DialogHeader>
           <QuizResult
             result={selectedQuiz}

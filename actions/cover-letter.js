@@ -4,12 +4,10 @@ import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import OpenAI from "openai";
 
-// Initialize OpenAI client
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// Utility: validate required fields
 function validateInput(data) {
   if (!data?.jobTitle || !data?.companyName || !data?.jobDescription) {
     throw new Error("Missing required fields");
@@ -29,38 +27,46 @@ export async function generateCoverLetter(data) {
 
     if (!user) throw new Error("User not found");
 
+    // Priority: 1. Uploaded Resume Text, 2. Profile Bio, 3. Default N/A
+    const candidateContext = data.resumeText || user.bio || "N/A";
+
     const prompt = `
 Write a professional cover letter for a ${data.jobTitle} position at ${data.companyName}.
 
-About the candidate:
-- Industry: ${user.industry || "N/A"}
-- Years of Experience: ${user.experience || "N/A"}
-- Skills: ${user.skills?.join(", ") || "N/A"}
-- Professional Background: ${user.bio || "N/A"}
+About the candidate (from provided resume/profile):
+${candidateContext}
+
+Candidate Skills: ${user.skills?.join(", ") || "N/A"}
 
 Job Description:
 ${data.jobDescription}
 
 Requirements:
-1. Professional and enthusiastic tone
-2. Highlight relevant skills and experience
-3. Align with company needs
-4. Max 400 words
-5. Proper business letter format (markdown)
-6. Include achievements
-7. Relate background to job
+1. Professional and enthusiastic tone.
+2. Highlight relevant skills and experience from the candidate's context.
+3. Align candidate achievements with specific company needs mentioned in the JD.
+4. Max 400 words in proper business letter markdown format.
 `;
 
-    const response = await openai.responses.create({
+    const response = await openai.chat.completions.create({
       model: "gpt-5-nano",
-      input: prompt,
+      messages: [
+        {
+          role: "system",
+          content: "You are an expert career coach writing high-conversion cover letters.",
+        },
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
     });
 
-    const content = response.output_text?.trim();
+    const content = response.choices[0].message.content?.trim();
 
     if (!content) throw new Error("Empty response from AI");
 
-    const coverLetter = await db.coverLetter.create({
+    return await db.coverLetter.create({
       data: {
         content,
         jobDescription: data.jobDescription,
@@ -70,8 +76,6 @@ Requirements:
         userId: user.id,
       },
     });
-
-    return coverLetter;
   } catch (error) {
     console.error("Generate Cover Letter Error:", error);
     throw new Error(error.message || "Failed to generate cover letter");

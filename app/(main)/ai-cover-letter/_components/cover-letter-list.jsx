@@ -1,114 +1,101 @@
 "use client";
 
+import React from "react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
-import { Edit2, Eye, Trash2 } from "lucide-react";
+import { Edit2, Eye, Trash2, Calendar } from "lucide-react";
 import { toast } from "sonner";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 import { deleteCoverLetter } from "@/actions/cover-letter";
+
+const s = {
+  root: { minHeight: "100vh", background: "#080808", color: "#e5e5e5", fontFamily: "'DM Sans', 'Inter', system-ui, sans-serif" },
+  card: { background: "#111", border: "1px solid #1a1a1a", borderRadius: 14, padding: "24px", transition: "all 0.2s", cursor: "pointer" },
+  cardHover: { transform: "translateY(-2px)", boxShadow: "0 20px 25px -5px rgb(124 58 237 / 0.1)" },
+  title: { fontSize: 20, fontWeight: 700, color: "#fff", marginBottom: 4 },
+  subtitle: { fontSize: 14, color: "#a78bfa", marginBottom: 12 },
+  meta: { fontSize: 13, color: "#6b7280", display: "flex", alignItems: "center", gap: 6 },
+  snippet: { fontSize: 14, color: "#9ca3af", lineHeight: 1.6, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" },
+  actionBtn: { background: "#1f1f1f", border: "1px solid #2a2a2a", borderRadius: 8, width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", color: "#e5e5e5", transition: "all 0.15s" },
+};
 
 export default function CoverLetterList({ coverLetters }) {
   const router = useRouter();
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (id, e) => {
+    e.stopPropagation();
+    if (!confirm("Delete this cover letter permanently?")) return;
     try {
       await deleteCoverLetter(id);
-      toast.success("Cover letter deleted successfully!");
+      toast.success("Cover letter deleted");
       router.refresh();
-    } catch (error) {
-      toast.error(error.message || "Failed to delete cover letter");
+    } catch (err) {
+      toast.error("Failed to delete");
     }
   };
 
   if (!coverLetters?.length) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>No Cover Letters Yet</CardTitle>
-          <CardDescription>
-            Create your first cover letter to get started
-          </CardDescription>
-        </CardHeader>
-      </Card>
+      <div style={s.root}>
+        <div style={{ maxWidth: 720, margin: "120px auto", textAlign: "center", padding: "60px 40px" }}>
+          <div style={{ fontSize: 64, marginBottom: 24 }}>📄</div>
+          <h2 style={{ fontSize: 28, fontWeight: 700, marginBottom: 12 }}>No cover letters yet</h2>
+          <p style={{ color: "#6b7280", fontSize: 16, maxWidth: 320, margin: "0 auto 32px" }}>
+            Your AI-generated cover letters will appear here
+          </p>
+          <button
+            onClick={() => router.push("/ai-cover-letter/new")}
+            style={{ background: "#7c3aed", color: "#fff", border: "none", borderRadius: 10, padding: "14px 32px", fontSize: 15, fontWeight: 600 }}
+          >
+            Create Your First Letter
+          </button>
+        </div>
+      </div>
     );
   }
 
   return (
-    <div className="space-y-4">
-      {coverLetters.map((letter) => (
-        <Card key={letter.id} className="group relative ">
-          <CardHeader>
-            <div className="flex items-start justify-between">
-              <div>
-                <CardTitle className="text-xl gradient-title">
-                  {letter.jobTitle} at {letter.companyName}
-                </CardTitle>
-                <CardDescription>
-                  Created {format(new Date(letter.createdAt), "PPP")}
-                </CardDescription>
-              </div>
-              <div className="flex space-x-2">
-                <AlertDialog>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => router.push(`/ai-cover-letter/${letter.id}`)}
-                  >
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                  <AlertDialogTrigger asChild>
-                    <Button variant="outline" size="icon">
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Delete Cover Letter?</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        This action cannot be undone. This will permanently
-                        delete your cover letter for {letter.jobTitle} at{" "}
-                        {letter.companyName}.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={() => handleDelete(letter.id)}
-                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                      >
-                        Delete
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </div>
+    <div style={{ padding: "40px 48px", maxWidth: 1100, margin: "0 auto" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: 20 }}>
+        {coverLetters.map((letter) => (
+          <div
+            key={letter.id}
+            style={s.card}
+            onClick={() => router.push(`/ai-cover-letter/${letter.id}`)}
+            onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-2px)")}
+            onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
+          >
+            <div style={s.title}>
+              {letter.jobTitle}
             </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-muted-foreground text-sm line-clamp-3">
-              {letter.jobDescription}
+            <div style={s.subtitle}>at {letter.companyName}</div>
+
+            <div style={s.meta}>
+              <Calendar size={14} />
+              {format(new Date(letter.createdAt), "MMM d, yyyy")}
             </div>
-          </CardContent>
-        </Card>
-      ))}
+
+            <p style={s.snippet}>{letter.jobDescription}</p>
+
+            <div style={{ marginTop: 24, display: "flex", gap: 8, justifyContent: "flex-end" }}>
+              <button
+                style={s.actionBtn}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  router.push(`/ai-cover-letter/${letter.id}`);
+                }}
+              >
+                <Eye size={18} />
+              </button>
+              <button
+                style={{ ...s.actionBtn, color: "#ef4444" }}
+                onClick={(e) => handleDelete(letter.id, e)}
+              >
+                <Trash2 size={18} />
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

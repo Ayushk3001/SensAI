@@ -9,105 +9,62 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-export async function saveResume(content) {
-  try {
-    const { userId } = await auth();
-    if (!userId) throw new Error("Unauthorized");
-
-    if (!content) throw new Error("Content is required");
-
-    const user = await db.user.findUnique({
-      where: { clerkUserId: userId },
-    });
-
-    if (!user) throw new Error("User not found");
-
-    const resume = await db.resume.upsert({
-      where: { userId: user.id },
-      update: { content },
-      create: {
-        userId: user.id,
-        content,
-      },
-    });
-
-    revalidatePath("/resume");
-    return resume;
-  } catch (error) {
-    console.error("Save Resume Error:", error);
-    throw new Error("Failed to save resume");
-  }
-}
-
 export async function getResume() {
-  try {
-    const { userId } = await auth();
-    if (!userId) throw new Error("Unauthorized");
-
-    const user = await db.user.findUnique({
-      where: { clerkUserId: userId },
-    });
-
-    if (!user) throw new Error("User not found");
-
-    return await db.resume.findUnique({
-      where: { userId: user.id },
-    });
-  } catch (error) {
-    console.error("Get Resume Error:", error);
-    throw new Error("Failed to fetch resume");
-  }
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+  const user = await db.user.findUnique({ where: { clerkUserId: userId } });
+  if (!user) throw new Error("User not found");
+  return await db.resume.findUnique({ where: { userId: user.id } });
 }
 
-export async function improveWithAI({ current, type }) {
+export async function analyzeAndSaveResume(resumeText, jobDescription) {
   try {
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized");
 
-    if (!current || !type) {
-      throw new Error("Missing required fields");
-    }
-
-    const user = await db.user.findUnique({
-      where: { clerkUserId: userId },
-      include: { industryInsight: true },
-    });
-
+    const user = await db.user.findUnique({ where: { clerkUserId: userId } });
     if (!user) throw new Error("User not found");
 
     const prompt = `
-As an expert resume writer, improve the following ${type} description for a ${user.industry || "general"} professional.
+      You are an expert ATS (Applicant Tracking System) Analyzer and Resume Writer. 
+      Analyze the provided Resume against the Job Description.
 
-Make it impactful, quantifiable, and aligned with industry standards.
+      TASK:
+      1. Calculate an ATS Match Score (0-100).
+      2. Identify missing keywords.
+      3. Provide specific improvement recommendations.
+      4. REWRITE the resume into a tailored Markdown version that fits STRICTLY on ONE PAGE.
 
-Current content:
-"${current}"
+      RESUME: ${resumeText}
+      JD: ${jobDescription}
 
-Requirements:
-- Use strong action verbs
-- Add measurable results (numbers, %, impact)
-- Highlight relevant technical skills
-- Focus on achievements, not responsibilities
-- Use industry-specific keywords
-- Keep it concise
+      RETURN ONLY A JSON OBJECT:
+      {
+        "score": number,
+        "missingKeywords": ["string"],
+        "recommendations": ["string"],
+        "tailoredResume": "markdown_string"
+      }
+    `;
 
-Return ONLY the improved paragraph. No explanations.
-`;
-
-    const response = await openai.responses.create({
+    const response = await openai.chat.completions.create({
       model: "gpt-5-nano",
-      input: prompt,
+      messages: [{ role: "system", content: "You are a professional recruiter." }, { role: "user", content: prompt }],
+      response_format: { type: "json_object" },
     });
 
-    const improvedContent = response.output_text?.trim();
+    const result = JSON.parse(response.choices[0].message.content);
 
-    if (!improvedContent) {
-      throw new Error("Empty response from AI");
-    }
+    // Save the new tailored version to the database
+    await db.resume.upsert({
+      where: { userId: user.id },
+      update: { content: result.tailoredResume },
+      create: { userId: user.id, content: result.tailoredResume },
+    });
 
-    return improvedContent;
+    revalidatePath("/resume");
+    return result;
   } catch (error) {
-    console.error("Improve Resume Error:", error);
-    throw new Error("Failed to improve content");
+    throw new Error("Diagnostic failed: " + error.message);
   }
 }

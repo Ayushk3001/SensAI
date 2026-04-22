@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
 const HeroSection = () => {
   const imageRef = useRef(null);
+  const [showVideo, setShowVideo] = useState(false);
 
   useEffect(() => {
     const imageElement = imageRef.current;
@@ -45,25 +46,45 @@ const HeroSection = () => {
             <Link href="/dashboard" style={s.link}>
               <button style={s.primaryBtn}>Get Started</button>
             </Link>
-            <Link href="#" style={s.link}>
-              <button style={s.secondaryBtn}>Watch Demo</button>
-            </Link>
+            <button
+              style={s.secondaryBtn}
+              onClick={() => setShowVideo((v) => !v)}
+            >
+              {showVideo ? "✕ Close Demo" : "▶ Watch Demo"}
+            </button>
           </div>
         </div>
 
-        {/* Full-screen fitting banner */}
-        <div style={s.imageWrapper}>
-          <div ref={imageRef} style={s.imageContainer} className="hero-image">
-            <Image
-              src="/banner.jpeg"
-              width={1920}
-              height={1080}
-              alt="Dashboard Preview"
-              style={s.image}
-              priority
-            />
+        {/* YouTube Video Embed — shown when Watch Demo is clicked */}
+        {showVideo && (
+          <div style={s.videoWrapper}>
+            <div style={s.videoContainer}>
+              <iframe
+                src="https://www.youtube.com/embed/CZu3ANlo2d8?autoplay=1"
+                title="Demo Video"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                style={s.iframe}
+              />
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* Full-screen fitting banner — hidden when video is shown */}
+        {!showVideo && (
+          <div style={s.imageWrapper}>
+            <div ref={imageRef} style={s.imageContainer} className="hero-image">
+              <Image
+                src="/banner.jpeg"
+                width={1920}
+                height={1080}
+                alt="Dashboard Preview"
+                style={s.image}
+                priority
+              />
+            </div>
+          </div>
+        )}
       </div>
 
       <style>{`
@@ -75,6 +96,10 @@ const HeroSection = () => {
           filter: brightness(0.95);
         }
         * { box-sizing: border-box; }
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(24px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
       `}</style>
     </section>
   );
@@ -82,7 +107,7 @@ const HeroSection = () => {
 
 export default HeroSection;
 
-// ─── HERO STYLES (Banner now fits the screen beautifully) ─────────────────────
+// ─── STYLES ───────────────────────────────────────────────────────────────────
 const s = {
   root: {
     minHeight: "100vh",
@@ -156,9 +181,37 @@ const s = {
     cursor: "pointer",
     transition: "all 0.3s",
   },
+
+  // ── Video ──
+  videoWrapper: {
+    width: "100%",
+    maxWidth: "1100px",
+    margin: "0 auto",
+    padding: "0 20px",
+    animation: "fadeInUp 0.5s ease forwards",
+  },
+  videoContainer: {
+    position: "relative",
+    paddingBottom: "56.25%", // 16:9
+    height: 0,
+    borderRadius: "24px",
+    overflow: "hidden",
+    boxShadow: "0 25px 60px -15px rgba(124, 58, 237, 0.4)",
+    border: "1px solid #2a2a2a",
+  },
+  iframe: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    border: "none",
+  },
+
+  // ── Banner ──
   imageWrapper: {
     width: "100%",
-    maxWidth: "1400px",           // ← Much larger for better screen fit
+    maxWidth: "1400px",
     margin: "0 auto",
     padding: "0 20px",
   },

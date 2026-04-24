@@ -1,7 +1,9 @@
 {
-  "name": "ai-career-coach",
+  "name": "sensai-ayush-k-shetty",
   "version": "0.1.0",
   "private": true,
+  "author": "Ayush K Shetty",
+  "license": "MIT",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",

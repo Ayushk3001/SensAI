@@ -8,7 +8,7 @@ export default async function EditCoverLetterPage({ params }) {
   const coverLetter = await getCoverLetter(id);
 
   if (!coverLetter) {
-    return <div style={{ padding: 60, textAlign: "center", color: "#ef4444" }}>Cover letter not found</div>;
+    return <div style={{ padding: 60, textAlign: "center", color: "hsl(var(--destructive))" }}>Cover letter not found</div>;
   }
 
   return (
@@ -37,10 +37,10 @@ export default async function EditCoverLetterPage({ params }) {
 }
 
 const s = {
-  root: { minHeight: "100vh", background: "#080808", color: "#e5e5e5", fontFamily: "'DM Sans', 'Inter', system-ui, sans-serif" },
-  header: { padding: "40px 48px", borderBottom: "1px solid #1a1a1a" },
-  backBtn: { background: "transparent", border: "1px solid #2a2a2a", color: "#e5e5e5", borderRadius: 8, padding: "10px 20px", display: "flex", alignItems: "center", gap: 8, fontSize: 14, fontWeight: 500, cursor: "pointer" },
-  title: { fontSize: 36, fontWeight: 700, color: "#fff", marginTop: 20, marginBottom: 4 },
-  at: { color: "#7c3aed", fontWeight: 400 },
-  date: { fontSize: 15, color: "#6b7280" },
+  root: { minHeight: "100vh", background: "hsl(var(--background))", color: "hsl(var(--foreground))", fontFamily: "'DM Sans', 'Inter', system-ui, sans-serif" },
+  header: { padding: "40px 48px", borderBottom: "1px solid hsl(var(--border))" },
+  backBtn: { background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", color: "hsl(var(--foreground))", borderRadius: 8, padding: "10px 20px", display: "flex", alignItems: "center", gap: 8, fontSize: 14, fontWeight: 500, cursor: "pointer" },
+  title: { fontSize: 36, fontWeight: 700, color: "hsl(var(--foreground))", marginTop: 20, marginBottom: 4 },
+  at: { color: "hsl(var(--primary))", fontWeight: 400 },
+  date: { fontSize: 15, color: "hsl(var(--muted-foreground))" },
 };

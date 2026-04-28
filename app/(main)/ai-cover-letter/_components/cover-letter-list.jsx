@@ -6,24 +6,23 @@ import { format } from "date-fns";
 import { Edit2, Eye, Trash2, Calendar } from "lucide-react";
 import { toast } from "sonner";
 import { deleteCoverLetter } from "@/actions/cover-letter";
+import { DeleteConfirmButton } from "@/components/delete-confirm-button";
 
 const s = {
-  root: { minHeight: "100vh", background: "#080808", color: "#e5e5e5", fontFamily: "'DM Sans', 'Inter', system-ui, sans-serif" },
-  card: { background: "#111", border: "1px solid #1a1a1a", borderRadius: 14, padding: "24px", transition: "all 0.2s", cursor: "pointer" },
-  cardHover: { transform: "translateY(-2px)", boxShadow: "0 20px 25px -5px rgb(124 58 237 / 0.1)" },
-  title: { fontSize: 20, fontWeight: 700, color: "#fff", marginBottom: 4 },
-  subtitle: { fontSize: 14, color: "#a78bfa", marginBottom: 12 },
-  meta: { fontSize: 13, color: "#6b7280", display: "flex", alignItems: "center", gap: 6 },
-  snippet: { fontSize: 14, color: "#9ca3af", lineHeight: 1.6, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" },
-  actionBtn: { background: "#1f1f1f", border: "1px solid #2a2a2a", borderRadius: 8, width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", color: "#e5e5e5", transition: "all 0.15s" },
+  root: { minHeight: "100vh", background: "hsl(var(--background))", color: "hsl(var(--foreground))", fontFamily: "'DM Sans', 'Inter', system-ui, sans-serif" },
+  card: { background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, padding: "24px", transition: "all 0.2s", cursor: "pointer" },
+  cardHover: { transform: "translateY(-2px)", boxShadow: "0 20px 25px -5px hsl(var(--primary) / 0.1)" },
+  title: { fontSize: 20, fontWeight: 700, color: "hsl(var(--foreground))", marginBottom: 4 },
+  subtitle: { fontSize: 14, color: "hsl(var(--primary))", marginBottom: 12 },
+  meta: { fontSize: 13, color: "hsl(var(--muted-foreground))", display: "flex", alignItems: "center", gap: 6 },
+  snippet: { fontSize: 14, color: "hsl(var(--muted-foreground))", lineHeight: 1.6, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" },
+  actionBtn: { background: "hsl(var(--muted))", border: "1px solid hsl(var(--border))", borderRadius: 8, width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", color: "hsl(var(--foreground))", transition: "all 0.15s" },
 };
 
 export default function CoverLetterList({ coverLetters }) {
   const router = useRouter();
 
-  const handleDelete = async (id, e) => {
-    e.stopPropagation();
-    if (!confirm("Delete this cover letter permanently?")) return;
+  const handleDelete = async (id) => {
     try {
       await deleteCoverLetter(id);
       toast.success("Cover letter deleted");
@@ -39,12 +38,12 @@ export default function CoverLetterList({ coverLetters }) {
         <div style={{ maxWidth: 720, margin: "120px auto", textAlign: "center", padding: "60px 40px" }}>
           <div style={{ fontSize: 64, marginBottom: 24 }}>📄</div>
           <h2 style={{ fontSize: 28, fontWeight: 700, marginBottom: 12 }}>No cover letters yet</h2>
-          <p style={{ color: "#6b7280", fontSize: 16, maxWidth: 320, margin: "0 auto 32px" }}>
+          <p style={{ color: "hsl(var(--muted-foreground))", fontSize: 16, maxWidth: 320, margin: "0 auto 32px" }}>
             Your AI-generated cover letters will appear here
           </p>
           <button
             onClick={() => router.push("/ai-cover-letter/new")}
-            style={{ background: "#7c3aed", color: "#fff", border: "none", borderRadius: 10, padding: "14px 32px", fontSize: 15, fontWeight: 600 }}
+            style={{ background: "hsl(var(--primary))", color: "hsl(var(--primary-foreground))", border: "none", borderRadius: 8, padding: "14px 32px", fontSize: 15, fontWeight: 600 }}
           >
             Create Your First Letter
           </button>
@@ -86,12 +85,18 @@ export default function CoverLetterList({ coverLetters }) {
               >
                 <Eye size={18} />
               </button>
-              <button
-                style={{ ...s.actionBtn, color: "#ef4444" }}
-                onClick={(e) => handleDelete(letter.id, e)}
+              <DeleteConfirmButton
+                title="Are you sure you want to delete this cover letter?"
+                description="This cover letter will be permanently removed."
+                onConfirm={() => handleDelete(letter.id)}
+                buttonProps={{
+                  variant: "ghost",
+                  size: "icon",
+                  style: { ...s.actionBtn, color: "hsl(var(--destructive))" },
+                }}
               >
                 <Trash2 size={18} />
-              </button>
+              </DeleteConfirmButton>
             </div>
           </div>
         ))}

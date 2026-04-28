@@ -1,230 +1,81 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
-import Image from "next/image";
+import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
+import {
+  ArrowRight,
+  Play,
+  Sparkles,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-const HeroSection = () => {
-  const imageRef = useRef(null);
+export default function HeroSection() {
   const [showVideo, setShowVideo] = useState(false);
 
-  useEffect(() => {
-    const imageElement = imageRef.current;
-    if (!imageElement) return;
-
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY;
-      const scrollThreshold = 100;
-
-      if (scrollPosition > scrollThreshold) {
-        imageElement.classList.add("scrolled");
-      } else {
-        imageElement.classList.remove("scrolled");
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
   return (
-    <section style={s.root}>
-      <div style={s.container}>
-        <div style={s.textContent}>
-          <h1 style={s.title}>
-            Your AI Career Coach for
-            <br />
-            <span style={s.titleAccent}>Professional Success</span>
+    <section className="relative overflow-hidden pt-28">
+      <div className="mx-auto flex min-h-[calc(100vh-5rem)] max-w-7xl flex-col items-center px-4 pb-12 text-center sm:px-6 lg:px-8">
+        <div className="max-w-4xl">
+          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-primary/25 bg-primary/10 px-3 py-1 text-sm font-semibold text-primary shadow-sm">
+            <Sparkles className="h-4 w-4" />
+            SensAI Career Operating System
+          </div>
+          <h1 className="text-balance text-5xl font-extrabold leading-[1.04] tracking-tight text-foreground sm:text-6xl lg:text-7xl">
+            Run your career like a premium command center.
           </h1>
-
-          <p style={s.subtitle}>
-            Advance your career with personalized guidance, ATS-optimized resumes,
-            custom learning roadmaps, and live AI voice interviews.
+          <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">
+            Build tailored resumes, practice interviews, track roles, read market signals,
+            and follow a learning roadmap from one calm AI workspace.
           </p>
-
-          <div style={s.buttonGroup}>
-            <Link href="/dashboard" style={s.link}>
-              <button style={s.primaryBtn}>Get Started</button>
-            </Link>
-            <button
-              style={s.secondaryBtn}
-              onClick={() => setShowVideo((v) => !v)}
+          <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+            <Button size="lg" asChild>
+              <Link href="/dashboard">
+                Open Career OS
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Button>
+            <Button
+              type="button"
+              size="lg"
+              variant="outline"
+              onClick={() => setShowVideo((value) => !value)}
             >
-              {showVideo ? "✕ Close Demo" : "▶ Watch Demo"}
-            </button>
+              <Play className="h-4 w-4" />
+              {showVideo ? "Close Demo" : "Watch Demo"}
+            </Button>
           </div>
         </div>
 
-        {/* YouTube Video Embed — shown when Watch Demo is clicked */}
-        {showVideo && (
-          <div style={s.videoWrapper}>
-            <div style={s.videoContainer}>
-              <iframe
-                src="https://www.youtube.com/embed/CZu3ANlo2d8?autoplay=1"
-                title="Demo Video"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                style={s.iframe}
-              />
+        <div className="relative mt-12 w-full">
+          {showVideo ? (
+            <div className="mx-auto max-w-5xl overflow-hidden rounded-lg border border-border bg-card shadow-2xl shadow-slate-300/30 dark:shadow-none">
+              <div className="aspect-video">
+                <iframe
+                  src="https://www.youtube.com/embed/CZu3ANlo2d8?autoplay=1"
+                  title="SensAI demo"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="h-full w-full"
+                />
+              </div>
             </div>
-          </div>
-        )}
-
-        {/* Full-screen fitting banner — hidden when video is shown */}
-        {!showVideo && (
-          <div style={s.imageWrapper}>
-            <div ref={imageRef} style={s.imageContainer} className="hero-image">
-              <Image
-                src="/banner.jpeg"
-                width={1920}
-                height={1080}
-                alt="Dashboard Preview"
-                style={s.image}
-                priority
-              />
+          ) : (
+            <div className="mx-auto max-w-6xl rounded-lg border border-border bg-card p-3 shadow-2xl shadow-slate-300/30 dark:shadow-none">
+              <div className="overflow-hidden rounded-md border border-border bg-muted">
+                <Image
+                  src="/banner7.png"
+                  alt="SensAI dashboard preview"
+                  width={1800}
+                  height={1100}
+                  priority
+                  className="h-auto w-full object-contain"
+                />
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
-
-      <style>{`
-        .hero-image {
-          transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .hero-image.scrolled {
-          transform: scale(0.97) translateY(20px);
-          filter: brightness(0.95);
-        }
-        * { box-sizing: border-box; }
-        @keyframes fadeInUp {
-          from { opacity: 0; transform: translateY(24px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
     </section>
   );
-};
-
-export default HeroSection;
-
-// ─── STYLES ───────────────────────────────────────────────────────────────────
-const s = {
-  root: {
-    minHeight: "100vh",
-    background: "#080808",
-    color: "#e5e5e5",
-    fontFamily: "'DM Sans', 'Inter', system-ui, sans-serif",
-    paddingTop: "110px",
-    paddingBottom: "60px",
-    position: "relative",
-    overflow: "hidden",
-  },
-  container: {
-    maxWidth: "1280px",
-    margin: "0 auto",
-    padding: "0 48px",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    textAlign: "center",
-    gap: "48px",
-  },
-  textContent: {
-    maxWidth: "780px",
-  },
-  title: {
-    fontSize: "clamp(42px, 6vw, 68px)",
-    fontWeight: 700,
-    lineHeight: 1.1,
-    marginBottom: "24px",
-    color: "#fff",
-  },
-  titleAccent: {
-    color: "#7c3aed",
-  },
-  subtitle: {
-    fontSize: "18px",
-    color: "#6b7280",
-    lineHeight: 1.6,
-    maxWidth: "580px",
-    margin: "0 auto 40px",
-  },
-  buttonGroup: {
-    display: "flex",
-    gap: "16px",
-    justifyContent: "center",
-    flexWrap: "wrap",
-  },
-  link: {
-    textDecoration: "none",
-  },
-  primaryBtn: {
-    background: "#7c3aed",
-    color: "#fff",
-    border: "none",
-    borderRadius: 14,
-    padding: "16px 36px",
-    fontSize: "16px",
-    fontWeight: 600,
-    cursor: "pointer",
-    transition: "all 0.3s",
-    boxShadow: "0 10px 25px -5px rgb(124 58 237)",
-  },
-  secondaryBtn: {
-    background: "transparent",
-    color: "#e5e5e5",
-    border: "1px solid #2a2a2a",
-    borderRadius: 14,
-    padding: "16px 36px",
-    fontSize: "16px",
-    fontWeight: 600,
-    cursor: "pointer",
-    transition: "all 0.3s",
-  },
-
-  // ── Video ──
-  videoWrapper: {
-    width: "100%",
-    maxWidth: "1100px",
-    margin: "0 auto",
-    padding: "0 20px",
-    animation: "fadeInUp 0.5s ease forwards",
-  },
-  videoContainer: {
-    position: "relative",
-    paddingBottom: "56.25%", // 16:9
-    height: 0,
-    borderRadius: "24px",
-    overflow: "hidden",
-    boxShadow: "0 25px 60px -15px rgba(124, 58, 237, 0.4)",
-    border: "1px solid #2a2a2a",
-  },
-  iframe: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    width: "100%",
-    height: "100%",
-    border: "none",
-  },
-
-  // ── Banner ──
-  imageWrapper: {
-    width: "100%",
-    maxWidth: "1400px",
-    margin: "0 auto",
-    padding: "0 20px",
-  },
-  imageContainer: {
-    borderRadius: "24px",
-    overflow: "hidden",
-    boxShadow: "0 25px 60px -15px rgba(124, 58, 237, 0.3)",
-    border: "1px solid #1a1a1a",
-  },
-  image: {
-    width: "100%",
-    height: "auto",
-    display: "block",
-    objectFit: "cover",
-  },
-};
+}

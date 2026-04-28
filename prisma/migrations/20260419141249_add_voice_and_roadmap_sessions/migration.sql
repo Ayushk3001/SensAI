@@ -1,0 +1,2 @@
+-- This migration already exists in the connected database.
+-- The local file restores migration history so Prisma can apply later migrations.

@@ -1,15 +1,27 @@
 import OpenAI from "openai";
 import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
+import { db } from "@/lib/prisma";
 
 // Initialize OpenAI using your existing key
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export async function POST(req) {
   try {
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { targetRole } = await req.json();
 
     if (!targetRole) {
       return NextResponse.json({ error: "Target role is required" }, { status: 400 });
+    }
+
+    const user = await db.user.findUnique({ where: { clerkUserId: userId } });
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     const prompt = `You are an expert technical career coach. Create a learning roadmap for someone who wants to become a "${targetRole}".
@@ -21,7 +33,7 @@ export async function POST(req) {
        - "id": A unique string (e.g., "1", "2").
        - "position": An object with "x" and "y" numbers. Start y at 0 and increase by 100 for each subsequent step down the path. Stagger x horizontally between 100 and 500 so nodes don't overlap.
        - "data": An object with a "label" string (the specific skill/tool name).
-       - "style": {"background": "linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)", "border": "2px solid #3b82f6", "borderRadius": "12px", "padding": "15px", "width": 200, "boxShadow": "0 4px 6px -1px rgb(0 0 0 / 0.1)", "textAlign": "center", "fontSize": "15px", "fontWeight": "bold", "color": "#1e3a8a"}
+       - "style": {"borderRadius": "8px", "padding": "15px", "width": 200, "textAlign": "center", "fontSize": "15px", "fontWeight": "bold"}
     2. "edges": Array of objects. Each object MUST have:
        - "id": A unique string (e.g., "e1-2").
        - "source": The ID of the parent node.
@@ -43,7 +55,17 @@ export async function POST(req) {
     // Parse OpenAI's response
     const data = JSON.parse(completion.choices[0].message.content);
 
-    return NextResponse.json(data);
+    const roadmap = await db.roadmap.create({
+      data: {
+        userId: user.id,
+        targetRole,
+        nodes: data.nodes || [],
+        edges: data.edges || [],
+        completedNodeIds: [],
+      },
+    });
+
+    return NextResponse.json({ ...data, id: roadmap.id, createdAt: roadmap.createdAt });
   } catch (error) {
     console.error("Roadmap generation error:", error);
     return NextResponse.json({ error: "Failed to generate roadmap" }, { status: 500 });

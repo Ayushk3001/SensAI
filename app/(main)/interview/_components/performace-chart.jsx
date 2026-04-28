@@ -34,17 +34,17 @@ export default function PerformanceChart({ assessments }) {
   }, [assessments]);
 
   return (
-    <Card className="border border-border/50 shadow-xl bg-card/95 backdrop-blur-xl">
+    <Card>
       <CardHeader className="pb-2">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-            <TrendingUp className="w-5 h-5 text-white" />
+          <div className="w-9 h-9 rounded-lg bg-secondary/10 text-secondary flex items-center justify-center">
+            <TrendingUp className="w-5 h-5" />
           </div>
           <div>
-            <CardTitle className="text-3xl font-semibold tracking-tight bg-gradient-to-r from-white to-zinc-300 bg-clip-text text-transparent">
+            <CardTitle className="text-2xl font-semibold tracking-tight">
               Performance Trend
             </CardTitle>
-            <CardDescription className="text-zinc-400">
+            <CardDescription>
               Your quiz scores over time
             </CardDescription>
           </div>
@@ -54,17 +54,17 @@ export default function PerformanceChart({ assessments }) {
         <div className="h-[340px] mt-4">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData} margin={{ top: 20, right: 30, left: 10, bottom: 10 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#27272a" />
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <XAxis 
                 dataKey="date" 
-                stroke="#a1a1aa"
+                stroke="hsl(var(--muted-foreground))"
                 fontSize={12}
                 tickLine={false}
                 axisLine={false}
               />
               <YAxis 
                 domain={[0, 100]} 
-                stroke="#a1a1aa"
+                stroke="hsl(var(--muted-foreground))"
                 fontSize={12}
                 tickLine={false}
                 axisLine={false}
@@ -74,11 +74,11 @@ export default function PerformanceChart({ assessments }) {
                 content={({ active, payload }) => {
                   if (active && payload?.length) {
                     return (
-                      <div className="bg-zinc-900 border border-zinc-700 rounded-2xl p-4 shadow-2xl">
-                        <p className="text-sm font-semibold text-white">
-                          Score: <span className="text-purple-400">{payload[0].value}%</span>
+                      <div className="bg-card border border-border rounded-lg p-4 shadow-xl  ">
+                        <p className="text-sm font-semibold text-foreground">
+                          Score: <span className="text-primary">{payload[0].value}%</span>
                         </p>
-                        <p className="text-xs text-zinc-400 mt-1">
+                        <p className="text-xs text-muted-foreground mt-1">
                           {payload[0].payload.date}
                         </p>
                       </div>
@@ -90,10 +90,10 @@ export default function PerformanceChart({ assessments }) {
               <Line
                 type="monotone"
                 dataKey="score"
-                stroke="#a78bfa"
+                stroke="hsl(var(--primary))"
                 strokeWidth={3}
-                dot={{ fill: "#a78bfa", strokeWidth: 2, r: 5 }}
-                activeDot={{ r: 7, fill: "#c026d3" }}
+                dot={{ fill: "hsl(var(--primary))", strokeWidth: 2, r: 5 }}
+                activeDot={{ r: 7, fill: "hsl(var(--secondary))" }}
               />
             </LineChart>
           </ResponsiveContainer>

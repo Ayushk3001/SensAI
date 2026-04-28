@@ -1,3 +1,4 @@
+npm run dev
 /*
   Warnings:
 

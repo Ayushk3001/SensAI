@@ -3,6 +3,7 @@
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import OpenAI from "openai";
+import { revalidatePath } from "next/cache";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -175,10 +176,54 @@ export async function getAssessments() {
   }
 }
 
+export async function getVoiceInterviews() {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+
+  const user = await db.user.findUnique({
+    where: { clerkUserId: userId },
+  });
+
+  if (!user) throw new Error("User not found");
+
+  return await db.voiceInterview.findMany({
+    where: { userId: user.id },
+    orderBy: { createdAt: "desc" },
+    take: 20,
+  });
+}
+
+export async function deleteVoiceInterview(id) {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+
+  const user = await db.user.findUnique({
+    where: { clerkUserId: userId },
+  });
+
+  if (!user) throw new Error("User not found");
+
+  await db.voiceInterview.deleteMany({
+    where: {
+      id,
+      userId: user.id,
+    },
+  });
+
+  revalidatePath("/interview/voice");
+  revalidatePath("/dashboard");
+}
+
 // Voice Interview Evaluation (Includes the dynamic interviewType fixes we made earlier!)
 export async function evaluateVoiceInterview(history, jobDescription, interviewType = "technical") {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
+
+  const user = await db.user.findUnique({
+    where: { clerkUserId: userId },
+  });
+
+  if (!user) throw new Error("User not found");
 
   let evaluationCriteria = "";
   let competencyLabel = "";
@@ -234,7 +279,28 @@ export async function evaluateVoiceInterview(history, jobDescription, interviewT
     });
 
     const text = completion.choices[0].message.content;
-    return JSON.parse(text);
+    const result = JSON.parse(text);
+
+    const savedInterview = await db.voiceInterview.create({
+      data: {
+        userId: user.id,
+        jobTitle: "Mock Interview",
+        interviewType,
+        jobDescription,
+        transcript: history,
+        scores: result.scores || {},
+        feedback: result.feedback || "",
+        keyMetrics: result.keyMetrics || [],
+        rating: result.scores?.overall || null,
+        status: "completed",
+      },
+    });
+
+    revalidatePath("/interview");
+    revalidatePath("/interview/voice");
+    revalidatePath("/dashboard");
+
+    return { ...result, id: savedInterview.id, createdAt: savedInterview.createdAt };
   } catch (error) {
     console.error("Error evaluating interview:", error);
     throw new Error("Failed to evaluate interview");

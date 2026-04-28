@@ -2,471 +2,174 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import HeroSection from "@/components/hero";
-import {
-  ArrowRight,
-  Trophy,
-  Target,
-  Sparkles,
-  CheckCircle2,
-} from "lucide-react";
+import { ArrowRight, CheckCircle2, Sparkles } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Button } from "@/components/ui/button";
 import { features } from "@/data/features";
 import { testimonial } from "@/data/testimonial";
 import { faqs } from "@/data/faqs";
 import { howItWorks } from "@/data/howItWorks";
 
+const stats = [
+  ["50+", "Industries modeled"],
+  ["1000+", "Practice questions"],
+  ["95%", "Users feel more prepared"],
+  ["24/7", "AI career support"],
+];
+
 export default function LandingPage() {
   return (
     <>
-      <div className="grid-background" />
-
       <HeroSection />
 
-      {/* Features Section */}
-      <section style={s.section}>
-        <div style={s.container}>
-          <h2 style={s.sectionTitle}>Powerful Features for Your Career Growth</h2>
-          <div style={s.featuresGrid}>
+      <section className="border-y border-border bg-card/70 py-14  ">
+        <div className="mx-auto grid max-w-7xl gap-4 px-4 sm:grid-cols-2 sm:px-6 lg:grid-cols-4 lg:px-8">
+          {stats.map(([value, label]) => (
+            <div key={label} className="rounded-lg border border-border bg-card p-6 text-center shadow-sm  ">
+              <div className="text-4xl font-extrabold text-foreground">{value}</div>
+              <div className="mt-2 text-sm font-medium text-muted-foreground">{label}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="max-w-2xl">
+            <p className="text-sm font-bold uppercase tracking-[0.14em] text-primary">Platform</p>
+            <h2 className="mt-3 text-4xl font-extrabold tracking-tight text-foreground">
+              Everything your career needs, organized into one operating system.
+            </h2>
+          </div>
+          <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {features.map((feature, index) => (
-              <div key={index} style={s.featureCard} className="glass-card">
-                <div style={s.featureIconWrap}>{feature.icon}</div>
-                <h3 style={s.featureTitle}>{feature.title}</h3>
-                <p style={s.featureDesc}>{feature.description}</p>
+              <div key={index} className="metric-card">
+                <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-lg bg-primary/10 text-primary ">
+                  {feature.icon}
+                </div>
+                <h3 className="text-lg font-bold text-foreground">{feature.title}</h3>
+                <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                  {feature.description}
+                </p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Stats Section with Glassmorphism */}
-      <section style={s.statsSection}>
-        <div style={s.container}>
-          <div style={s.statsGrid} className="glass-stats">
-            <div style={s.statItem}>
-              <h3 style={s.statNumber}>50+</h3>
-              <p style={s.statLabel}>Industries Covered</p>
-            </div>
-            <div style={s.statItem}>
-              <h3 style={s.statNumber}>1000+</h3>
-              <p style={s.statLabel}>Interview Questions</p>
-            </div>
-            <div style={s.statItem}>
-              <h3 style={s.statNumber}>95%</h3>
-              <p style={s.statLabel}>Success Rate</p>
-            </div>
-            <div style={s.statItem}>
-              <h3 style={s.statNumber}>24/7</h3>
-              <p style={s.statLabel}>AI Support</p>
-            </div>
+      <section className="bg-card/70 py-20 ">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-2xl text-center">
+            <p className="text-sm font-bold uppercase tracking-[0.14em] text-secondary">Workflow</p>
+            <h2 className="mt-3 text-4xl font-extrabold tracking-tight text-foreground">
+              From role target to interview confidence.
+            </h2>
           </div>
-        </div>
-      </section>
-
-      {/* How It Works */}
-      <section style={s.section}>
-        <div style={s.container}>
-          <div style={s.sectionHeader}>
-            <h2 style={s.sectionTitle}>How It Works</h2>
-            <p style={s.sectionSubtitle}>
-              Four simple steps to accelerate your career growth
-            </p>
-          </div>
-          <div style={s.howGrid}>
+          <div className="mt-12 grid gap-4 md:grid-cols-4">
             {howItWorks.map((item, index) => (
-              <div key={index} style={s.howItem} className="hover-lift">
-                <div style={s.howIcon} className="icon-glow">{item.icon}</div>
-                <h3 style={s.howTitle}>{item.title}</h3>
-                <p style={s.howDesc}>{item.description}</p>
+              <div key={index} className="relative rounded-lg border border-border bg-card p-6 shadow-sm  ">
+                <div className="mb-5 flex h-10 w-10 items-center justify-center rounded-full bg-secondary/10 text-sm font-bold text-secondary  ">
+                  {index + 1}
+                </div>
+                <div className="mb-4 text-primary">{item.icon}</div>
+                <h3 className="font-bold text-foreground">{item.title}</h3>
+                <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                  {item.description}
+                </p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section style={s.section}>
-        <div style={s.container}>
-          <h2 style={s.sectionTitle}>What Our Users Say</h2>
-          <div style={s.testimonialGrid}>
+      <section className="py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <h2 className="text-center text-4xl font-extrabold tracking-tight text-foreground">
+            Trusted by ambitious professionals
+          </h2>
+          <div className="mt-10 grid gap-4 lg:grid-cols-3">
             {testimonial.map((t, index) => (
-              <div key={index} style={s.testimonialCard} className="glass-card">
-                <div style={s.testimonialHeader}>
+              <div key={index} className="rounded-lg border border-border bg-card p-6 shadow-sm  ">
+                <div className="flex items-center gap-4">
                   <Image
                     src={t.image}
                     alt={t.author}
                     width={48}
                     height={48}
-                    className="rounded-full border-2 border-[#7c3aed]/50 shadow-lg"
+                    className="rounded-full border border-border"
                   />
                   <div>
-                    <p style={s.testimonialName}>{t.author}</p>
-                    <p style={s.testimonialRole}>
-                      {t.role} • {t.company}
+                    <p className="font-bold text-foreground">{t.author}</p>
+                    <p className="text-sm text-primary">
+                      {t.role} at {t.company}
                     </p>
                   </div>
                 </div>
-                <p style={s.testimonialQuote}>{t.quote}</p>
+                <p className="mt-5 text-sm leading-7 text-muted-foreground">
+                  {t.quote}
+                </p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* FAQ */}
-      <section style={s.section}>
-        <div style={s.container}>
-          <div style={s.sectionHeader}>
-            <h2 style={s.sectionTitle}>Frequently Asked Questions</h2>
-            <p style={s.sectionSubtitle}>
-              Find answers to common questions about our platform
-            </p>
+      <section className="bg-card/70 py-20 ">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <p className="text-sm font-bold uppercase tracking-[0.14em] text-accent">FAQ</p>
+            <h2 className="mt-3 text-4xl font-extrabold tracking-tight text-foreground">
+              Questions before you begin
+            </h2>
           </div>
-          <div style={s.faqContainer}>
-            <Accordion type="single" collapsible style={{ width: "100%" }}>
-              {faqs.map((faq, index) => (
-                <AccordionItem key={index} value={`item-${index}`} className="glass-accordion">
-                  <AccordionTrigger style={s.accordionTrigger}>
-                    {faq.question}
-                  </AccordionTrigger>
-                  <AccordionContent style={s.accordionContent}>
-                    {faq.answer}
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
-          </div>
+          <Accordion type="single" collapsible className="mt-10 space-y-3">
+            {faqs.map((faq, index) => (
+              <AccordionItem
+                key={index}
+                value={`item-${index}`}
+                className="rounded-lg border border-border bg-card px-5  "
+              >
+                <AccordionTrigger className="text-left font-semibold text-foreground">
+                  {faq.question}
+                </AccordionTrigger>
+                <AccordionContent className="leading-7 text-muted-foreground">
+                  {faq.answer}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
         </div>
       </section>
 
-      {/* Final CTA */}
-      <section style={s.ctaSection} className="cta-gradient-animate">
-        <div style={s.ctaContent}>
-          <h2 style={s.ctaTitle}>Ready to Accelerate Your Career?</h2>
-          <p style={s.ctaSubtitle}>
-            Join thousands of professionals who are advancing their careers with
-            AI-powered guidance.
-          </p>
-          <Link href="/dashboard" style={s.link}>
-            <button style={s.ctaBtn} className="btn-glow">
-              Start Your Journey Today <ArrowRight size={20} />
-            </button>
-          </Link>
+      <section className="px-4 py-20 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-5xl rounded-lg border border-primary/25 bg-primary/100 p-8 text-primary-foreground shadow-xl shadow-teal-500/20 sm:p-12">
+          <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
+            <div>
+              <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-card/15 px-3 py-1 text-sm font-semibold">
+                <Sparkles className="h-4 w-4" />
+                Ready when you are
+              </div>
+              <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
+                Build your next career move with clarity.
+              </h2>
+              <p className="mt-4 max-w-2xl text-teal-50">
+                SensAI brings documents, interviews, applications, and learning plans into one focused workspace.
+              </p>
+            </div>
+            <Button size="lg" variant="secondary" asChild>
+              <Link href="/dashboard">
+                Start today
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
         </div>
       </section>
-
-      <style>{`
-        .grid-background {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(to right, #1a1a1a 1px, transparent 1px),
-                      linear-gradient(to bottom, #1a1a1a 1px, transparent 1px);
-          background-size: 60px 60px;
-          opacity: 0.08;
-          pointer-events: none;
-          z-index: -1;
-        }
-
-        .glass-card {
-          background: rgba(17, 17, 17, 0.6) !important;
-          backdrop-filter: blur(12px) !important;
-          border: 1px solid rgba(255, 255, 255, 0.05) !important;
-          transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .glass-card:hover {
-          transform: translateY(-10px);
-          background: rgba(124, 58, 237, 0.05) !important;
-          border-color: rgba(124, 58, 237, 0.4) !important;
-          box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-        }
-
-        .glass-stats {
-          background: rgba(124, 58, 237, 0.03);
-          backdrop-filter: blur(8px);
-          border: 1px solid rgba(124, 58, 237, 0.1);
-          padding: 40px;
-          border-radius: 24px;
-        }
-
-        .glass-accordion {
-          background: rgba(17, 17, 17, 0.4);
-          backdrop-filter: blur(4px);
-          border: 1px solid rgba(255, 255, 255, 0.03);
-          border-radius: 12px;
-          margin-bottom: 12px;
-        }
-
-        .hover-lift {
-          transition: transform 0.3s ease;
-        }
-        .hover-lift:hover {
-          transform: translateY(-5px);
-        }
-
-        .icon-glow {
-          transition: all 0.3s ease;
-          box-shadow: 0 0 0 rgba(124, 58, 237, 0);
-        }
-        .hover-lift:hover .icon-glow {
-          box-shadow: 0 0 20px rgba(124, 58, 237, 0.3);
-          transform: scale(1.1);
-        }
-
-        .btn-glow {
-          transition: all 0.3s ease;
-          position: relative;
-          overflow: hidden;
-        }
-        .btn-glow:hover {
-          box-shadow: 0 0 25px rgba(124, 58, 237, 0.6);
-          transform: scale(1.02);
-        }
-
-        .cta-gradient-animate {
-          background-size: 200% 200% !important;
-          animation: gradientShift 8s ease infinite;
-        }
-
-        @keyframes gradientShift {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-        }
-
-        * { box-sizing: border-box; }
-      `}</style>
     </>
   );
 }
-
-const s = {
-  section: {
-    width: "100%",
-    padding: "60px 0", // Reduced from 100px
-    background: "#080808",
-  },
-  container: {
-    maxWidth: "1280px",
-    margin: "0 auto",
-    padding: "0 48px",
-  },
-  sectionTitle: {
-    fontSize: "42px",
-    fontWeight: 800,
-    textAlign: "center",
-    marginBottom: "32px", // Reduced from 48px
-    color: "#fff",
-    letterSpacing: "-0.02em",
-  },
-  sectionSubtitle: {
-    fontSize: "19px",
-    color: "#9ca3af",
-    textAlign: "center",
-    maxWidth: "600px",
-    margin: "0 auto 32px", // Reduced from 48px
-    lineHeight: 1.6,
-  },
-  sectionHeader: {
-    textAlign: "center",
-    marginBottom: "40px", // Reduced from 60px
-  },
-
-  // Features
-  featuresGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-    gap: "32px",
-  },
-  featureCard: {
-    background: "#111",
-    borderRadius: "24px",
-    padding: "40px 32px",
-    textAlign: "left",
-  },
-  featureIconWrap: {
-    fontSize: "42px",
-    marginBottom: "24px",
-    color: "#a78bfa",
-    display: "inline-block",
-  },
-  featureTitle: {
-    fontSize: "24px",
-    fontWeight: 700,
-    marginBottom: "16px",
-    color: "#fff",
-  },
-  featureDesc: {
-    fontSize: "16px",
-    color: "#9ca3af",
-    lineHeight: 1.6,
-  },
-
-  // Stats
-  statsSection: {
-    width: "100%",
-    padding: "40px 0", // Reduced from 100px
-    background: "#080808",
-  },
-  statsGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-    gap: "32px",
-    textAlign: "center",
-  },
-  statItem: {},
-  statNumber: {
-    fontSize: "56px",
-    fontWeight: 800,
-    color: "#7c3aed",
-    marginBottom: "8px",
-    textShadow: "0 0 20px rgba(124, 58, 237, 0.3)",
-  },
-  statLabel: {
-    fontSize: "16px",
-    color: "#9ca3af",
-    fontWeight: 500,
-    textTransform: "uppercase",
-    letterSpacing: "0.05em",
-  },
-
-  // How It Works
-  howGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-    gap: "48px",
-  },
-  howItem: {
-    textAlign: "center",
-  },
-  howIcon: {
-    width: "80px",
-    height: "80px",
-    background: "rgba(124, 58, 237, 0.1)",
-    border: "1px solid rgba(124, 58, 237, 0.2)",
-    borderRadius: "24px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    margin: "0 auto 24px",
-    fontSize: "32px",
-    color: "#a78bfa",
-  },
-  howTitle: {
-    fontSize: "22px",
-    fontWeight: 700,
-    marginBottom: "12px",
-    color: "#fff",
-  },
-  howDesc: {
-    fontSize: "16px",
-    color: "#9ca3af",
-    lineHeight: 1.6,
-  },
-
-  // Testimonials
-  testimonialGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(360px, 1fr))",
-    gap: "32px",
-  },
-  testimonialCard: {
-    borderRadius: "24px",
-    padding: "40px",
-  },
-  testimonialHeader: {
-    display: "flex",
-    alignItems: "center",
-    gap: "20px",
-    marginBottom: "24px",
-  },
-  testimonialName: {
-    fontSize: "18px",
-    fontWeight: 700,
-    color: "#fff",
-  },
-  testimonialRole: {
-    fontSize: "14px",
-    color: "#7c3aed",
-    fontWeight: 500,
-  },
-  testimonialQuote: {
-    fontSize: "17px",
-    lineHeight: 1.8,
-    color: "#d1d5db",
-    fontStyle: "italic",
-    opacity: 0.9,
-  },
-
-  // FAQ
-  faqContainer: {
-    maxWidth: "850px",
-    margin: "0 auto",
-  },
-  accordionTrigger: {
-    fontSize: "18px",
-    fontWeight: 600,
-    padding: "24px",
-    textAlign: "left",
-    color: "#f3f4f6",
-    border: "none",
-  },
-  accordionContent: {
-    fontSize: "16px",
-    color: "#9ca3af",
-    padding: "0 24px 24px",
-    lineHeight: 1.6,
-  },
-
-  // CTA
-  ctaSection: {
-    width: "100%",
-    padding: "80px 48px", // Reduced from 120px
-    background: "linear-gradient(135deg, #0f0720 0%, #1a0f35 50%, #0f0720 100%)",
-    margin: "20px 0", // Reduced from 40px
-    borderTop: "1px solid rgba(124, 58, 237, 0.2)",
-    borderBottom: "1px solid rgba(124, 58, 237, 0.2)",
-  },
-  ctaContent: {
-    maxWidth: "800px",
-    margin: "0 auto",
-    textAlign: "center",
-  },
-  ctaTitle: {
-    fontSize: "48px",
-    fontWeight: 800,
-    color: "#fff",
-    marginBottom: "24px",
-    letterSpacing: "-0.03em",
-  },
-  ctaSubtitle: {
-    fontSize: "20px",
-    color: "#c4b5fd",
-    marginBottom: "40px",
-    lineHeight: 1.6,
-    opacity: 0.9,
-  },
-  ctaBtn: {
-    background: "#7c3aed",
-    color: "#fff",
-    border: "none",
-    borderRadius: "16px",
-    padding: "20px 48px",
-    fontSize: "18px",
-    fontWeight: 600,
-    display: "inline-flex",
-    alignItems: "center",
-    gap: "14px",
-    cursor: "pointer",
-  },
-  link: {
-    textDecoration: "none",
-  },
-};

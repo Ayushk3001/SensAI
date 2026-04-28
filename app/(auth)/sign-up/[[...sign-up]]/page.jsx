@@ -1,5 +1,5 @@
-import { SignUp } from "@clerk/nextjs";
+import { ThemedSignUp } from "@/components/clerk-auth-form";
 
 export default function Page() {
-  return <SignUp />;
+  return <ThemedSignUp />;
 }

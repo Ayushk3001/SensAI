@@ -1,12 +1,9 @@
 import React from "react";
-import { LayoutDashboard, LogIn } from "lucide-react";
 import Link from "next/link";
-import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import Image from "next/image";
 import { checkUser } from "@/lib/checkUser";
-import GrowthDropdown from "@/components/GrowthDropdown";
-import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { HeaderAuthActions } from "@/components/header-auth-actions";
 
 export default async function Header() {
   await checkUser();
@@ -30,37 +27,7 @@ export default async function Header() {
 
         <div className="flex items-center gap-2">
           <ThemeToggle />
-          <SignedIn>
-            <Button variant="outline" size="sm" asChild>
-              <Link href="/dashboard">
-                <LayoutDashboard className="h-4 w-4" />
-                <span className="hidden sm:inline">Insights</span>
-              </Link>
-            </Button>
-            <GrowthDropdown />
-          </SignedIn>
-
-          <SignedOut>
-            <SignInButton>
-              <Button size="sm">
-                <LogIn className="h-4 w-4" />
-                Sign In
-              </Button>
-            </SignInButton>
-          </SignedOut>
-
-          <SignedIn>
-            <UserButton
-              appearance={{
-                elements: {
-                  avatarBox: "w-9 h-9 ring-2 ring-border shadow-sm",
-                  userButtonPopoverCard: "shadow-xl border border-border bg-card text-card-foreground",
-                  userPreviewMainIdentifier: "font-semibold",
-                },
-              }}
-              afterSignOutUrl="/"
-            />
-          </SignedIn>
+          <HeaderAuthActions />
         </div>
       </nav>
     </header>

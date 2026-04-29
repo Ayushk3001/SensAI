@@ -1,12 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { Trash2 } from "lucide-react";
+import { Map, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { deleteRoadmap } from "@/actions/roadmap";
 import { DeleteConfirmButton } from "@/components/delete-confirm-button";
 import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 
 export default function RoadmapHistoryList({ initialRoadmaps }) {
   const [roadmaps, setRoadmaps] = useState(initialRoadmaps || []);
@@ -26,9 +28,13 @@ export default function RoadmapHistoryList({ initialRoadmaps }) {
 
   if (!roadmaps.length) {
     return (
-      <div className="rounded-xl border border-dashed border-border p-10 text-center text-muted-foreground">
-        No roadmaps yet. Generate your first career path.
-      </div>
+      <Card className="border-dashed">
+        <CardContent className="py-12 text-center">
+          <Map className="mx-auto mb-3 h-8 w-8 text-primary" />
+          <p className="font-semibold text-foreground">No roadmaps yet</p>
+          <p className="mt-1 text-sm text-muted-foreground">Generate your first career path.</p>
+        </CardContent>
+      </Card>
     );
   }
 
@@ -42,7 +48,7 @@ export default function RoadmapHistoryList({ initialRoadmaps }) {
         return (
           <div
             key={roadmap.id}
-            className="group relative rounded-xl border border-transparent bg-card p-4 transition-all hover:border-primary/30 hover:bg-muted"
+            className="group relative rounded-lg border border-border/70 bg-card/60 p-4 shadow-sm backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:bg-card/80 hover:shadow-xl hover:shadow-primary/10"
           >
             <Link href={`/roadmap/new?roadmap=${roadmap.id}`} className="block">
               <div className="flex items-center justify-between gap-3 pr-9">
@@ -56,7 +62,7 @@ export default function RoadmapHistoryList({ initialRoadmaps }) {
                     })}
                   </p>
                 </div>
-                <div className="text-xl font-bold text-primary">{progress}%</div>
+                <Badge variant="outline" className="border-primary/25 bg-primary/10 text-primary">{progress}%</Badge>
               </div>
               <Progress value={progress} className="mt-4" />
               <p className="mt-3 text-xs text-muted-foreground">{done}/{total} nodes complete</p>

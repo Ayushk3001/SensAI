@@ -34,7 +34,7 @@ export default function PerformanceChart({ assessments }) {
   }, [assessments]);
 
   return (
-    <Card>
+    <Card className="soft-card-hover">
       <CardHeader className="pb-2">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-lg bg-secondary/10 text-secondary flex items-center justify-center">

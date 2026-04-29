@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Briefcase, Building2, Link as LinkIcon, MapPin, Plus, Trash2 } from "lucide-react";
+import { Briefcase, Building2, Link as LinkIcon, MapPin, MoreHorizontal, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import {
   createJobApplication,
@@ -15,6 +15,19 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const STATUSES = [
   { value: "saved", label: "Saved" },
@@ -103,7 +116,10 @@ export default function JobTracker({ initialApplications, resumeVersions, coverL
 
   return (
     <div className="space-y-6">
-      <div className="rounded-lg border border-border bg-card/80 p-6 shadow-sm  ">
+      <div className="glass-panel p-6 fade-up">
+        <Badge variant="outline" className="mb-3 border-primary/25 bg-primary/10 text-primary">
+          Pipeline workspace
+        </Badge>
         <h1 className="text-4xl font-extrabold tracking-tight text-foreground md:text-5xl">Job Tracker</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
           Track applications, attach generated assets, and keep your pipeline moving.
@@ -111,20 +127,23 @@ export default function JobTracker({ initialApplications, resumeVersions, coverL
       </div>
 
       <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
-        {STATUSES.map((status) => (
-          <Card key={status.value}>
+        {STATUSES.map((status, index) => (
+          <Card key={status.value} className={`soft-card-hover fade-up stagger-${Math.min(index + 1, 4)}`}>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm text-muted-foreground">{status.label}</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">{counts[status.value] || 0}</div>
+              <div className="flex items-end justify-between gap-2">
+                <div className="text-3xl font-bold">{counts[status.value] || 0}</div>
+                <Badge variant="outline" className={`status-${status.value}`}>{status.label}</Badge>
+              </div>
             </CardContent>
           </Card>
         ))}
       </div>
 
       <div className="grid items-start gap-6 lg:grid-cols-[360px_1fr]">
-        <Card>
+        <Card className="sticky top-24 soft-card-hover">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Plus className="h-5 w-5" />
@@ -153,18 +172,21 @@ export default function JobTracker({ initialApplications, resumeVersions, coverL
               </div>
               <div className="space-y-2">
                 <Label htmlFor="status">Status</Label>
-                <select
-                  id="status"
-                  className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm shadow-sm  "
+                <Select
                   value={form.status}
-                  onChange={(event) => setForm({ ...form, status: event.target.value })}
+                  onValueChange={(value) => setForm({ ...form, status: value })}
                 >
-                  {STATUSES.map((status) => (
-                    <option key={status.value} value={status.value}>
-                      {status.label}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger id="status">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {STATUSES.map((status) => (
+                      <SelectItem key={status.value} value={status.value}>
+                        {status.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="location">Location</Label>
@@ -184,35 +206,41 @@ export default function JobTracker({ initialApplications, resumeVersions, coverL
               </div>
               <div className="space-y-2">
                 <Label htmlFor="resumeVersionId">Resume Version</Label>
-                <select
-                  id="resumeVersionId"
-                  className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm shadow-sm  "
-                  value={form.resumeVersionId}
-                  onChange={(event) => setForm({ ...form, resumeVersionId: event.target.value })}
+                <Select
+                  value={form.resumeVersionId || "none"}
+                  onValueChange={(value) => setForm({ ...form, resumeVersionId: value === "none" ? "" : value })}
                 >
-                  <option value="">No resume attached</option>
-                  {resumeVersions.map((version) => (
-                    <option key={version.id} value={version.id}>
-                      {version.title} ({version.atsScore ?? "N/A"} ATS)
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger id="resumeVersionId">
+                    <SelectValue placeholder="No resume attached" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">No resume attached</SelectItem>
+                    {resumeVersions.map((version) => (
+                      <SelectItem key={version.id} value={version.id}>
+                        {version.title} ({version.atsScore ?? "N/A"} ATS)
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="coverLetterId">Cover Letter</Label>
-                <select
-                  id="coverLetterId"
-                  className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm shadow-sm  "
-                  value={form.coverLetterId}
-                  onChange={(event) => setForm({ ...form, coverLetterId: event.target.value })}
+                <Select
+                  value={form.coverLetterId || "none"}
+                  onValueChange={(value) => setForm({ ...form, coverLetterId: value === "none" ? "" : value })}
                 >
-                  <option value="">No cover letter attached</option>
-                  {coverLetters.map((letter) => (
-                    <option key={letter.id} value={letter.id}>
-                      {letter.companyName} - {letter.jobTitle}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger id="coverLetterId">
+                    <SelectValue placeholder="No cover letter attached" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">No cover letter attached</SelectItem>
+                    {coverLetters.map((letter) => (
+                      <SelectItem key={letter.id} value={letter.id}>
+                        {letter.companyName} - {letter.jobTitle}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="notes">Notes</Label>
@@ -233,13 +261,17 @@ export default function JobTracker({ initialApplications, resumeVersions, coverL
         <div className="grid auto-rows-max content-start gap-4">
           {applications.length === 0 ? (
             <Card>
-              <CardContent className="py-12 text-center text-muted-foreground">
-                No jobs tracked yet. Add the first opportunity from the form.
+              <CardContent className="py-14 text-center">
+                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <Briefcase className="h-6 w-6" />
+                </div>
+                <p className="font-semibold text-foreground">No jobs tracked yet</p>
+                <p className="mt-1 text-sm text-muted-foreground">Add the first opportunity from the form.</p>
               </CardContent>
             </Card>
           ) : (
             applications.map((application) => (
-              <Card key={application.id}>
+              <Card key={application.id} className="soft-card-hover">
                 <CardContent className="p-5">
                   <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                     <div className="space-y-3">
@@ -247,6 +279,9 @@ export default function JobTracker({ initialApplications, resumeVersions, coverL
                         <div className="flex items-center gap-2">
                           <Briefcase className="h-4 w-4 text-teal-500" />
                           <h2 className="text-xl font-semibold">{application.jobTitle}</h2>
+                          <Badge variant="outline" className={`status-${application.status}`}>
+                            {application.status}
+                          </Badge>
                         </div>
                         <div className="mt-2 flex flex-wrap gap-3 text-sm text-muted-foreground">
                           <span className="inline-flex items-center gap-1">
@@ -296,30 +331,52 @@ export default function JobTracker({ initialApplications, resumeVersions, coverL
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <select
-                        className="rounded-lg border border-border bg-card px-3 py-2 text-sm capitalize shadow-sm  "
+                      <Select
                         value={application.status}
-                        onChange={(event) =>
-                          handleStatusChange(application.id, event.target.value)
-                        }
+                        onValueChange={(value) => handleStatusChange(application.id, value)}
                       >
-                        {STATUSES.map((status) => (
-                          <option key={status.value} value={status.value}>
-                            {status.label}
-                          </option>
-                        ))}
-                      </select>
-                      <DeleteConfirmButton
-                        title="Are you sure you want to delete this job?"
-                        description="This job application will be permanently removed from your tracker."
-                        onConfirm={() => handleDelete(application.id)}
-                        buttonProps={{
-                          variant: "ghost",
-                          size: "icon",
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </DeleteConfirmButton>
+                        <SelectTrigger className="w-[150px]">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {STATUSES.map((status) => (
+                            <SelectItem key={status.value} value={status.value}>
+                              {status.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          {application.jobUrl && (
+                            <DropdownMenuItem asChild>
+                              <a href={application.jobUrl} target="_blank" rel="noreferrer">
+                                <LinkIcon className="mr-2 h-4 w-4" />
+                                Open job post
+                              </a>
+                            </DropdownMenuItem>
+                          )}
+                          <div className="p-1">
+                          <DeleteConfirmButton
+                            title="Are you sure you want to delete this job?"
+                            description="This job application will be permanently removed from your tracker."
+                            onConfirm={() => handleDelete(application.id)}
+                            buttonProps={{
+                              variant: "ghost",
+                              className: "w-full justify-start px-2 text-destructive hover:text-destructive",
+                            }}
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete job
+                          </DeleteConfirmButton>
+                          </div>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   </div>
                 </CardContent>

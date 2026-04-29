@@ -2,6 +2,7 @@ import Link from "next/link";
 import { History, Map, PlusCircle, Route, Target } from "lucide-react";
 import { getRoadmaps } from "@/actions/roadmap";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
@@ -20,8 +21,11 @@ export default async function RoadmapDashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col justify-between gap-4 rounded-lg border border-border bg-card/80 p-6 shadow-sm   md:flex-row md:items-end">
+      <div className="glass-panel flex flex-col justify-between gap-4 p-6 fade-up md:flex-row md:items-end">
         <div>
+          <Badge variant="outline" className="mb-3 border-primary/25 bg-primary/10 text-primary">
+            Learning command center
+          </Badge>
           <h1 className="text-4xl font-extrabold tracking-tight text-foreground md:text-5xl">
             Career Roadmaps
           </h1>
@@ -38,7 +42,7 @@ export default async function RoadmapDashboardPage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
-        <Card>
+        <Card className="soft-card-hover">
           <CardHeader className="flex flex-row items-center justify-between pb-3">
             <CardTitle className="text-sm font-medium text-muted-foreground">Roadmaps Created</CardTitle>
             <Map className="h-5 w-5 text-teal-500" />
@@ -49,7 +53,7 @@ export default async function RoadmapDashboardPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="soft-card-hover">
           <CardHeader className="flex flex-row items-center justify-between pb-3">
             <CardTitle className="text-sm font-medium text-muted-foreground">Average Progress</CardTitle>
             <Target className="h-5 w-5 text-emerald-500" />
@@ -60,7 +64,7 @@ export default async function RoadmapDashboardPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="soft-card-hover">
           <CardHeader className="flex flex-row items-center justify-between pb-3">
             <CardTitle className="text-sm font-medium text-muted-foreground">Nodes Completed</CardTitle>
             <Route className="h-5 w-5 text-amber-500" />
@@ -72,7 +76,7 @@ export default async function RoadmapDashboardPage() {
         </Card>
       </div>
 
-      <Card>
+      <Card className="soft-card-hover">
         <CardHeader>
           <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
             <div>

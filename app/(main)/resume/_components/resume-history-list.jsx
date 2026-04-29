@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { Trash2 } from "lucide-react";
+import { FileText, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { deleteResumeVersion } from "@/actions/resume";
 import { DeleteConfirmButton } from "@/components/delete-confirm-button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 
 export default function ResumeHistoryList({ initialVersions }) {
   const [versions, setVersions] = useState(initialVersions || []);
@@ -25,9 +27,13 @@ export default function ResumeHistoryList({ initialVersions }) {
 
   if (!versions.length) {
     return (
-      <div className="rounded-xl border border-dashed border-border p-10 text-center text-muted-foreground">
-        No resume interactions yet. Tailor your first resume.
-      </div>
+      <Card className="border-dashed">
+        <CardContent className="py-12 text-center">
+          <FileText className="mx-auto mb-3 h-8 w-8 text-primary" />
+          <p className="font-semibold text-foreground">No resume interactions yet</p>
+          <p className="mt-1 text-sm text-muted-foreground">Tailor your first resume.</p>
+        </CardContent>
+      </Card>
     );
   }
 
@@ -37,7 +43,7 @@ export default function ResumeHistoryList({ initialVersions }) {
         <Link
           key={version.id}
           href="/resume/build"
-          className="group relative rounded-xl border border-transparent bg-card p-4 transition-all hover:border-primary/30 hover:bg-muted"
+          className="group relative rounded-lg border border-border/70 bg-card/60 p-4 shadow-sm backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:bg-card/80 hover:shadow-xl hover:shadow-primary/10"
         >
           <DeleteConfirmButton
             title="Are you sure you want to delete this resume?"
@@ -63,7 +69,9 @@ export default function ResumeHistoryList({ initialVersions }) {
                 })}
               </p>
             </div>
-            <div className="text-xl font-bold text-primary">{version.atsScore ?? "N/A"}%</div>
+            <Badge variant="outline" className="border-primary/25 bg-primary/10 text-primary">
+              {version.atsScore ?? "N/A"}%
+            </Badge>
           </div>
           <p className="mt-3 line-clamp-2 text-xs text-muted-foreground">
             {(version.recommendations || []).slice(0, 2).join(" • ") || "Tailored resume version"}

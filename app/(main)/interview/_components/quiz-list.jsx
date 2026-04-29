@@ -18,6 +18,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import QuizResult from "./quiz-result";
+import { Badge } from "@/components/ui/badge";
 
 export default function QuizList({ assessments }) {
   const router = useRouter();
@@ -25,7 +26,7 @@ export default function QuizList({ assessments }) {
 
   return (
     <>
-      <Card className="border border-border/50 shadow-xl">
+      <Card className="soft-card-hover">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
@@ -50,7 +51,7 @@ export default function QuizList({ assessments }) {
             {assessments?.map((assessment, i) => (
               <Card
                 key={assessment.id}
-                className="cursor-pointer hover:bg-muted border border-transparent hover:border-primary/30 transition-all p-4"
+                className="cursor-pointer border border-border/70 bg-card/60 p-4 transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:bg-card/80"
                 onClick={() => setSelectedQuiz(assessment)}
               >
                 <div className="flex items-center justify-between">
@@ -61,9 +62,9 @@ export default function QuizList({ assessments }) {
                     </CardDescription>
                   </div>
                   <div className="text-right">
-                    <div className="text-2xl font-bold text-primary">
+                    <Badge variant="outline" className="border-primary/25 bg-primary/10 text-primary text-base">
                       {assessment.quizScore.toFixed(1)}%
-                    </div>
+                    </Badge>
                   </div>
                 </div>
                 {assessment.improvementTip && (

@@ -1,12 +1,13 @@
 "use client";
 
-import { Trash2 } from "lucide-react";
+import { BarChart3, BriefcaseBusiness, Brain, Keyboard, Trash2, Users } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { deleteVoiceInterview } from "@/actions/interview";
 import { DeleteConfirmButton } from "@/components/delete-confirm-button";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardDescription, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogClose,
@@ -15,12 +16,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const INTERVIEW_SECTIONS = [
-  { value: "technical", label: "Technical Interviews" },
-  { value: "hr", label: "HR & Behavioral Interviews" },
-  { value: "aptitude", label: "Aptitude Interviews" },
-  { value: "managerial", label: "Managerial Interviews" },
+  { value: "technical", label: "Technical", title: "Technical Interviews", icon: Keyboard },
+  { value: "hr", label: "HR & Behavioral", title: "HR & Behavioral Interviews", icon: Users },
+  { value: "aptitude", label: "Aptitude", title: "Aptitude Interviews", icon: Brain },
+  { value: "managerial", label: "Managerial", title: "Managerial Interviews", icon: BriefcaseBusiness },
 ];
 
 function getScore(session, key) {
@@ -38,7 +40,7 @@ function formatDate(date) {
 function SessionCard({ session, index, total, onOpen, onDelete }) {
   return (
     <Card
-      className="cursor-pointer border border-transparent bg-card p-4 transition-all hover:border-primary/30 hover:bg-muted"
+      className="cursor-pointer border border-border/70 bg-card/60 p-4 transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:bg-muted/70"
       onClick={() => onOpen(session)}
     >
       <div className="flex items-center justify-between gap-4">
@@ -49,9 +51,9 @@ function SessionCard({ session, index, total, onOpen, onDelete }) {
           </CardDescription>
         </div>
         <div className="flex items-center gap-2">
-          <div className="text-2xl font-bold text-primary">
+          <Badge variant="outline" className="border-primary/25 bg-primary/10 text-lg font-bold text-primary">
             {getScore(session, "overall")}/10
-          </div>
+          </Badge>
           <DeleteConfirmButton
             title="Are you sure you want to delete this voice interview?"
             description="This voice interview result and transcript will be permanently removed."
@@ -99,47 +101,93 @@ export default function VoiceHistoryList({ initialSessions }) {
 
   if (!sessions.length) {
     return (
-      <div className="rounded-xl border border-dashed border-border p-10 text-center text-muted-foreground">
-        No voice interviews yet. Start your first speaking practice session.
-      </div>
+      <Card className="border-dashed">
+        <CardContent className="py-12 text-center">
+          <MicEmptyIcon />
+          <p className="mt-4 font-semibold text-foreground">No voice interviews yet</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Start your first speaking practice session.
+          </p>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
     <>
-      <div className="grid gap-5 xl:grid-cols-2">
-        {groupedSessions.map((section) => (
-          <div key={section.value} className="rounded-lg border border-border bg-card p-4">
-            <div className="mb-4 flex items-center justify-between">
-              <div>
-                <h3 className="text-xl font-semibold text-foreground">{section.label}</h3>
-                <p className="text-xs text-muted-foreground">
-                  {section.sessions.length} saved session{section.sessions.length === 1 ? "" : "s"}
-                </p>
-              </div>
-            </div>
+      <Tabs defaultValue="technical" className="space-y-5">
+        <TabsList className="grid h-auto w-full grid-cols-1 gap-2 bg-muted/40 p-2 sm:grid-cols-2 xl:grid-cols-4">
+          {groupedSessions.map((section) => {
+            const Icon = section.icon;
+            return (
+              <TabsTrigger
+                key={section.value}
+                value={section.value}
+                className="h-auto justify-start gap-3 rounded-lg px-4 py-3 text-left data-[state=active]:bg-card data-[state=active]:shadow-sm"
+              >
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <Icon className="h-4 w-4" />
+                </span>
+                <span className="min-w-0">
+                  <span className="block truncate font-semibold">{section.label}</span>
+                  <span className="block text-xs text-muted-foreground">
+                    {section.sessions.length} saved
+                  </span>
+                </span>
+              </TabsTrigger>
+            );
+          })}
+        </TabsList>
 
-            {section.sessions.length ? (
-              <div className="space-y-3">
-                {section.sessions.map((session, index) => (
-                  <SessionCard
-                    key={session.id}
-                    session={session}
-                    index={index}
-                    total={section.sessions.length}
-                    onOpen={setSelectedSession}
-                    onDelete={handleDelete}
-                  />
-                ))}
+        {groupedSessions.map((section) => {
+          const Icon = section.icon;
+          return (
+            <TabsContent key={section.value} value={section.value} className="mt-0 animate-in fade-in-50 slide-in-from-bottom-2">
+              <div className="rounded-lg border border-border/70 bg-card/45 p-5 backdrop-blur-xl">
+                <div className="mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                      <Icon className="h-5 w-5" />
+                    </span>
+                    <div>
+                      <h3 className="text-xl font-semibold text-foreground">{section.title}</h3>
+                      <p className="text-sm text-muted-foreground">
+                        {section.sessions.length} saved session{section.sessions.length === 1 ? "" : "s"}
+                      </p>
+                    </div>
+                  </div>
+                  <Badge variant="outline" className="w-fit border-primary/25 bg-primary/10 text-primary">
+                    <BarChart3 className="mr-1 h-3.5 w-3.5" />
+                    Focused view
+                  </Badge>
+                </div>
+
+                {section.sessions.length ? (
+                  <div className="space-y-3">
+                    {section.sessions.map((session, index) => (
+                      <SessionCard
+                        key={session.id}
+                        session={session}
+                        index={index}
+                        total={section.sessions.length}
+                        onOpen={setSelectedSession}
+                        onDelete={handleDelete}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="rounded-lg border border-dashed border-border p-10 text-center">
+                    <p className="font-semibold text-foreground">No {section.label.toLowerCase()} sessions yet</p>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      Start a new voice practice and choose this interview type.
+                    </p>
+                  </div>
+                )}
               </div>
-            ) : (
-              <div className="rounded-lg border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-                No sessions yet.
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
+            </TabsContent>
+          );
+        })}
+      </Tabs>
 
       <Dialog open={!!selectedSession} onOpenChange={() => setSelectedSession(null)}>
         <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto border-border bg-card [&>button]:hidden">
@@ -225,5 +273,13 @@ export default function VoiceHistoryList({ initialSessions }) {
         </DialogContent>
       </Dialog>
     </>
+  );
+}
+
+function MicEmptyIcon() {
+  return (
+    <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
+      <Brain className="h-6 w-6" />
+    </span>
   );
 }

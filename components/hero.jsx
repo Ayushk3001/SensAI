@@ -7,8 +7,11 @@ import {
   ArrowRight,
   Play,
   Sparkles,
+  ShieldCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 
 export default function HeroSection() {
   const [showVideo, setShowVideo] = useState(false);
@@ -16,11 +19,11 @@ export default function HeroSection() {
   return (
     <section className="relative overflow-hidden pt-28">
       <div className="mx-auto flex min-h-[calc(100vh-5rem)] max-w-7xl flex-col items-center px-4 pb-12 text-center sm:px-6 lg:px-8">
-        <div className="max-w-4xl">
-          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-primary/25 bg-primary/10 px-3 py-1 text-sm font-semibold text-primary shadow-sm">
+        <div className="max-w-4xl fade-up">
+          <Badge variant="outline" className="mb-5 border-primary/25 bg-primary/10 px-3 py-1 text-sm font-semibold text-primary shadow-sm backdrop-blur-xl">
             <Sparkles className="h-4 w-4" />
             SensAI Career Operating System
-          </div>
+          </Badge>
           <h1 className="text-balance text-5xl font-extrabold leading-[1.04] tracking-tight text-foreground sm:text-6xl lg:text-7xl">
             Run your career like a premium command center.
           </h1>
@@ -45,11 +48,19 @@ export default function HeroSection() {
               {showVideo ? "Close Demo" : "Watch Demo"}
             </Button>
           </div>
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-3 text-xs font-medium text-muted-foreground">
+            <span className="inline-flex items-center gap-1">
+              <ShieldCheck className="h-3.5 w-3.5 text-primary" />
+              Private workspace
+            </span>
+            <span className="h-1 w-1 rounded-full bg-border" />
+            <span>Resume, interview, jobs, and roadmap in one flow</span>
+          </div>
         </div>
 
-        <div className="relative mt-12 w-full">
+        <div className="relative mt-12 w-full fade-up stagger-2">
           {showVideo ? (
-            <div className="mx-auto max-w-5xl overflow-hidden rounded-lg border border-border bg-card shadow-2xl shadow-slate-300/30 dark:shadow-none">
+            <Card className="mx-auto max-w-5xl overflow-hidden border-primary/20 bg-card/70 p-2 shadow-2xl shadow-primary/10">
               <div className="aspect-video">
                 <iframe
                   src="https://www.youtube.com/embed/CZu3ANlo2d8?autoplay=1"
@@ -59,10 +70,18 @@ export default function HeroSection() {
                   className="h-full w-full"
                 />
               </div>
-            </div>
+            </Card>
           ) : (
-            <div className="mx-auto max-w-6xl rounded-lg border border-border bg-card p-3 shadow-2xl shadow-slate-300/30 dark:shadow-none">
-              <div className="overflow-hidden rounded-md border border-border bg-muted">
+            <Card className="hero-image-wrapper mx-auto max-w-6xl border-primary/20 bg-card/50 p-2 shadow-2xl shadow-primary/10">
+              <div className="rounded-lg border border-border/70 bg-background/70 p-2 backdrop-blur-xl">
+                <div className="flex items-center gap-2 border-b border-border/70 px-3 py-2">
+                  <span className="h-2.5 w-2.5 rounded-full bg-destructive/70" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-accent/80" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-primary/80" />
+                  <span className="ml-2 text-xs font-medium text-muted-foreground">sensai.app/dashboard</span>
+                </div>
+              </div>
+              <div className="hero-image overflow-hidden rounded-md border border-border/70 bg-muted">
                 <Image
                   src="/banner7.png"
                   alt="SensAI dashboard preview"
@@ -72,7 +91,7 @@ export default function HeroSection() {
                   className="h-auto w-full object-contain"
                 />
               </div>
-            </div>
+            </Card>
           )}
         </div>
       </div>

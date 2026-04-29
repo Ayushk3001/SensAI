@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import {
   BarChart,
   Bar,
@@ -21,8 +22,10 @@ import {
   FileText,
   Map,
   Mic,
+  PenLine,
   Target,
   Sparkles,
+  ArrowRight,
 } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
 import {
@@ -34,6 +37,15 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Tooltip as UiTooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const chartStroke = "hsl(var(--primary))";
 const blue = "hsl(var(--secondary))";
@@ -48,21 +60,23 @@ const kpiTone = {
 
 function KpiCard({ title, value, helper, icon: Icon, tone = "teal", children }) {
   return (
-    <Card className="overflow-hidden">
-      <CardContent className="p-5">
+    <Card className="h-full overflow-hidden soft-card-hover">
+      <CardContent className="flex min-h-[150px] flex-col p-5">
         <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="text-sm font-medium text-muted-foreground">{title}</p>
-            <div className="mt-3 text-3xl font-extrabold tracking-tight text-foreground">
+          <div className="min-w-0">
+            <p className="truncate text-sm font-semibold text-muted-foreground">{title}</p>
+            <div className="mt-3 text-3xl font-extrabold leading-none tracking-tight text-foreground">
               {value}
             </div>
           </div>
-          <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${kpiTone[tone]}`}>
+          <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${kpiTone[tone]}`}>
             <Icon className="h-5 w-5" />
           </div>
         </div>
-        {children}
-        <p className="mt-3 text-xs text-muted-foreground">{helper}</p>
+        <div className="mt-auto pt-4">
+          {children}
+          <p className="mt-3 text-sm text-muted-foreground">{helper}</p>
+        </div>
       </CardContent>
     </Card>
   );
@@ -142,18 +156,26 @@ const DashboardView = ({ insights, careerData = {} }) => {
   const nextUpdateDistance = formatDistanceToNow(new Date(insights.nextUpdate), {
     addSuffix: true,
   });
+  const quickActions = [
+    { href: "/resume", label: "Resume", icon: FileText, helper: "Tailor and score" },
+    { href: "/ai-cover-letter", label: "Cover Letter", icon: PenLine, helper: "Generate letters" },
+    { href: "/interview/mock", label: "Interview Prep", icon: Brain, helper: "Quiz practice" },
+    { href: "/interview/voice", label: "Voice Interview", icon: Mic, helper: "Speaking practice" },
+    { href: "/roadmap", label: "Roadmap", icon: Map, helper: "Build a path" },
+    { href: "/job-tracker", label: "Jobs", icon: BriefcaseIcon, helper: "Track pipeline" },
+  ];
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col justify-between gap-4 rounded-lg border border-border bg-card/80 p-6 shadow-sm   lg:flex-row lg:items-end">
+      <div className="glass-panel flex flex-col justify-between gap-4 p-6 fade-up lg:flex-row lg:items-end">
         <div>
           <Badge variant="outline" className="border-primary/25 bg-primary/10 text-primary   ">
             <Sparkles className="mr-1 h-3 w-3" />
             Career intelligence command center
           </Badge>
-          <h1 className="mt-4 text-4xl font-extrabold tracking-tight text-foreground md:text-5xl">
-            Industry Insights
-          </h1>
+          <h2 className="mt-4 text-3xl font-extrabold tracking-tight text-foreground md:text-4xl">
+            Career command center
+          </h2>
           <p className="mt-2 max-w-2xl text-muted-foreground">
             Your documents, interviews, roadmap, job pipeline, and market signals in one operating view.
           </p>
@@ -163,21 +185,71 @@ const DashboardView = ({ insights, careerData = {} }) => {
         </Badge>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-6">
-        <KpiCard title="Resume Score" value={resumeVersions[0]?.atsScore ? `${resumeVersions[0].atsScore}%` : "N/A"} helper={`${resumeVersions.length} saved versions`} icon={FileText} tone="teal" />
-        <KpiCard title="Readiness" value={`${averageVoiceScore.toFixed(1)}/10`} helper={`${voiceInterviews.length} voice sessions`} icon={Mic} tone="blue" />
-        <KpiCard title="Roadmap" value={`${roadmapProgress}%`} helper={`${roadmaps.length} active paths`} icon={Map} tone="amber">
+      <TooltipProvider>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+          {quickActions.map((action) => {
+            const Icon = action.icon;
+            return (
+              <TooltipProvider key={action.href}>
+                <UiTooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="outline" className="h-auto justify-between bg-card/55 p-4 backdrop-blur-xl soft-card-hover" asChild>
+                      <Link href={action.href}>
+                        <span className="flex items-center gap-3 text-left">
+                          <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                            <Icon className="h-5 w-5" />
+                          </span>
+                          <span>
+                            <span className="block text-sm font-semibold">{action.label}</span>
+                            <span className="block text-xs text-muted-foreground">{action.helper}</span>
+                          </span>
+                        </span>
+                        <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                      </Link>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Open {action.label}</TooltipContent>
+                </UiTooltip>
+              </TooltipProvider>
+            );
+          })}
+        </div>
+      </TooltipProvider>
+
+      <div className="space-y-3">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <h3 className="text-lg font-semibold tracking-tight text-foreground">Career snapshot</h3>
+            <p className="text-sm text-muted-foreground">Your latest progress across core SensAI tools.</p>
+          </div>
+          <Badge variant="outline" className="hidden border-primary/25 bg-primary/10 text-primary sm:inline-flex">
+            Live workspace
+          </Badge>
+        </div>
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
+        <div className="fade-up stagger-1"><KpiCard title="Resume Score" value={resumeVersions[0]?.atsScore ? `${resumeVersions[0].atsScore}%` : "N/A"} helper={`${resumeVersions.length} saved versions`} icon={FileText} tone="teal" /></div>
+        <div className="fade-up stagger-2"><KpiCard title="Readiness" value={`${averageVoiceScore.toFixed(1)}/10`} helper={`${voiceInterviews.length} voice sessions`} icon={Mic} tone="blue" /></div>
+        <div className="fade-up stagger-3"><KpiCard title="Roadmap" value={`${roadmapProgress}%`} helper={`${roadmaps.length} active paths`} icon={Map} tone="amber">
           <Progress value={roadmapProgress} className="mt-4" />
-        </KpiCard>
-        <KpiCard title="Active Jobs" value={activeJobs} helper={`Quiz avg ${averageQuizScore.toFixed(1)}%`} icon={Target} tone="emerald" />
-        <KpiCard title="Market" value={insights.marketOutlook} helper={`Next update ${nextUpdateDistance}`} icon={OutlookIcon} tone="blue" />
-        <KpiCard title="Growth" value={`${insights.growthRate.toFixed(1)}%`} helper={`${insights.demandLevel} demand`} icon={TrendingUp} tone="teal">
+        </KpiCard></div>
+        <div className="fade-up stagger-4"><KpiCard title="Active Jobs" value={activeJobs} helper={`Quiz avg ${averageQuizScore.toFixed(1)}%`} icon={Target} tone="emerald" /></div>
+        <div className="fade-up stagger-1"><KpiCard title="Market" value={insights.marketOutlook} helper={`Next update ${nextUpdateDistance}`} icon={OutlookIcon} tone="blue" /></div>
+        <div className="fade-up stagger-2"><KpiCard title="Growth" value={`${insights.growthRate.toFixed(1)}%`} helper={`${insights.demandLevel} demand`} icon={TrendingUp} tone="teal">
           <Progress value={insights.growthRate} className="mt-4" />
-        </KpiCard>
+        </KpiCard></div>
+      </div>
       </div>
 
+      <Tabs defaultValue="performance" className="space-y-4">
+        <TabsList className="bg-card/60 backdrop-blur-xl">
+          <TabsTrigger value="performance">Performance</TabsTrigger>
+          <TabsTrigger value="market">Market</TabsTrigger>
+          <TabsTrigger value="skills">Skills</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="performance" className="space-y-4 animate-in fade-in-50 slide-in-from-bottom-2">
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
+        <Card className="lg:col-span-2 soft-card-hover">
           <CardHeader>
             <CardTitle>Voice Interview Trend</CardTitle>
             <CardDescription>Overall score from recent voice interviews</CardDescription>
@@ -197,23 +269,25 @@ const DashboardView = ({ insights, careerData = {} }) => {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="soft-card-hover">
           <CardHeader>
             <CardTitle>Job Pipeline</CardTitle>
             <CardDescription>Applications grouped by status</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             {["saved", "applied", "interviewing", "offer", "rejected"].map((status) => (
-              <div key={status} className="flex items-center justify-between rounded-lg bg-muted px-3 py-2 ">
+              <div key={status} className="flex items-center justify-between rounded-lg border border-border/60 bg-muted/60 px-3 py-2 ">
                 <span className="capitalize text-sm text-muted-foreground">{status}</span>
-                <Badge variant="secondary">{statusCounts[status] || 0}</Badge>
+                <Badge variant="outline" className={`status-${status}`}>{statusCounts[status] || 0}</Badge>
               </div>
             ))}
           </CardContent>
         </Card>
       </div>
+        </TabsContent>
 
-      <Card>
+        <TabsContent value="market" className="space-y-4 animate-in fade-in-50 slide-in-from-bottom-2">
+      <Card className="soft-card-hover">
         <CardHeader>
           <CardTitle>Salary Ranges by Role</CardTitle>
           <CardDescription>Minimum, median, and maximum salaries in thousands</CardDescription>
@@ -252,7 +326,7 @@ const DashboardView = ({ insights, careerData = {} }) => {
       </Card>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <Card>
+        <Card className="soft-card-hover">
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
               <CardTitle>Demand Level</CardTitle>
@@ -266,7 +340,7 @@ const DashboardView = ({ insights, careerData = {} }) => {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="soft-card-hover">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Brain className="h-5 w-5 text-primary" />
@@ -283,7 +357,7 @@ const DashboardView = ({ insights, careerData = {} }) => {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="soft-card-hover">
           <CardHeader>
             <CardTitle>Recommended Skills</CardTitle>
             <CardDescription>Prioritize these next</CardDescription>
@@ -297,13 +371,16 @@ const DashboardView = ({ insights, careerData = {} }) => {
           </CardContent>
         </Card>
       </div>
+        </TabsContent>
 
-      <Card>
+        <TabsContent value="skills" className="animate-in fade-in-50 slide-in-from-bottom-2">
+      <Card className="soft-card-hover">
         <CardHeader>
           <CardTitle>Key Industry Trends</CardTitle>
           <CardDescription>Signals shaping your next move</CardDescription>
         </CardHeader>
         <CardContent>
+          <Separator className="mb-4" />
           <div className="grid gap-3 md:grid-cols-2">
             {insights.keyTrends.map((trend, index) => (
               <div key={index} className="flex items-start gap-3 rounded-lg bg-muted p-4 ">
@@ -314,6 +391,8 @@ const DashboardView = ({ insights, careerData = {} }) => {
           </div>
         </CardContent>
       </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

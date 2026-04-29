@@ -2,7 +2,7 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import HeroSection from "@/components/hero";
-import { ArrowRight, CheckCircle2, Sparkles } from "lucide-react";
+import { ArrowRight, Quote, Sparkles } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
@@ -10,6 +10,11 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+} from "@/components/ui/card";
 import { features } from "@/data/features";
 import { testimonial } from "@/data/testimonial";
 import { faqs } from "@/data/faqs";
@@ -27,13 +32,15 @@ export default function LandingPage() {
     <>
       <HeroSection />
 
-      <section className="border-y border-border bg-card/70 py-14  ">
+      <section className="border-y border-border/70 bg-card/40 py-14 backdrop-blur-xl">
         <div className="mx-auto grid max-w-7xl gap-4 px-4 sm:grid-cols-2 sm:px-6 lg:grid-cols-4 lg:px-8">
-          {stats.map(([value, label]) => (
-            <div key={label} className="rounded-lg border border-border bg-card p-6 text-center shadow-sm  ">
+          {stats.map(([value, label], index) => (
+            <Card key={label} className={`soft-card-hover fade-up stagger-${Math.min(index + 1, 4)} text-center`}>
+              <CardContent className="p-6">
               <div className="text-4xl font-extrabold text-foreground">{value}</div>
               <div className="mt-2 text-sm font-medium text-muted-foreground">{label}</div>
-            </div>
+              </CardContent>
+            </Card>
           ))}
         </div>
       </section>
@@ -41,14 +48,15 @@ export default function LandingPage() {
       <section className="py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="max-w-2xl">
-            <p className="text-sm font-bold uppercase tracking-[0.14em] text-primary">Platform</p>
+            <Badge variant="outline" className="border-primary/25 bg-primary/10 text-primary">Platform</Badge>
             <h2 className="mt-3 text-4xl font-extrabold tracking-tight text-foreground">
               Everything your career needs, organized into one operating system.
             </h2>
           </div>
           <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {features.map((feature, index) => (
-              <div key={index} className="metric-card">
+              <Card key={index} className={`metric-card fade-up stagger-${Math.min((index % 4) + 1, 4)}`}>
+                <CardContent className="p-0">
                 <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-lg bg-primary/10 text-primary ">
                   {feature.icon}
                 </div>
@@ -56,23 +64,25 @@ export default function LandingPage() {
                 <p className="mt-3 text-sm leading-6 text-muted-foreground">
                   {feature.description}
                 </p>
-              </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="bg-card/70 py-20 ">
+      <section className="bg-card/40 py-20 backdrop-blur-xl">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
-            <p className="text-sm font-bold uppercase tracking-[0.14em] text-secondary">Workflow</p>
+            <Badge variant="outline" className="border-secondary/25 bg-secondary/10 text-secondary">Workflow</Badge>
             <h2 className="mt-3 text-4xl font-extrabold tracking-tight text-foreground">
               From role target to interview confidence.
             </h2>
           </div>
           <div className="mt-12 grid gap-4 md:grid-cols-4">
             {howItWorks.map((item, index) => (
-              <div key={index} className="relative rounded-lg border border-border bg-card p-6 shadow-sm  ">
+              <Card key={index} className={`relative overflow-hidden soft-card-hover fade-up stagger-${Math.min(index + 1, 4)}`}>
+                <CardContent className="p-6">
                 <div className="mb-5 flex h-10 w-10 items-center justify-center rounded-full bg-secondary/10 text-sm font-bold text-secondary  ">
                   {index + 1}
                 </div>
@@ -81,7 +91,8 @@ export default function LandingPage() {
                 <p className="mt-3 text-sm leading-6 text-muted-foreground">
                   {item.description}
                 </p>
-              </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
         </div>
@@ -94,7 +105,8 @@ export default function LandingPage() {
           </h2>
           <div className="mt-10 grid gap-4 lg:grid-cols-3">
             {testimonial.map((t, index) => (
-              <div key={index} className="rounded-lg border border-border bg-card p-6 shadow-sm  ">
+              <Card key={index} className={`soft-card-hover fade-up stagger-${Math.min(index + 1, 3)}`}>
+                <CardContent className="p-6">
                 <div className="flex items-center gap-4">
                   <Image
                     src={t.image}
@@ -110,19 +122,21 @@ export default function LandingPage() {
                     </p>
                   </div>
                 </div>
-                <p className="mt-5 text-sm leading-7 text-muted-foreground">
+                <Quote className="mt-5 h-5 w-5 text-primary/50" />
+                <p className="mt-3 text-sm leading-7 text-muted-foreground">
                   {t.quote}
                 </p>
-              </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="bg-card/70 py-20 ">
+      <section className="bg-card/40 py-20 backdrop-blur-xl">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <p className="text-sm font-bold uppercase tracking-[0.14em] text-accent">FAQ</p>
+            <Badge variant="outline" className="border-accent/25 bg-accent/10 text-accent">FAQ</Badge>
             <h2 className="mt-3 text-4xl font-extrabold tracking-tight text-foreground">
               Questions before you begin
             </h2>
@@ -132,7 +146,7 @@ export default function LandingPage() {
               <AccordionItem
                 key={index}
                 value={`item-${index}`}
-                className="rounded-lg border border-border bg-card px-5  "
+                className="rounded-lg border border-border/70 bg-card/65 px-5 shadow-sm backdrop-blur-xl"
               >
                 <AccordionTrigger className="text-left font-semibold text-foreground">
                   {faq.question}
@@ -147,7 +161,7 @@ export default function LandingPage() {
       </section>
 
       <section className="px-4 py-20 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-5xl rounded-lg border border-primary/25 bg-primary/100 p-8 text-primary-foreground shadow-xl shadow-teal-500/20 sm:p-12">
+        <div className="mx-auto max-w-5xl rounded-lg border border-primary/25 bg-primary/95 p-8 text-primary-foreground shadow-xl shadow-primary/20 backdrop-blur-xl sm:p-12">
           <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
             <div>
               <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-card/15 px-3 py-1 text-sm font-semibold">

@@ -21,7 +21,7 @@ export default function StatsCards({ assessments }) {
       {cards.map((card) => {
         const Icon = card.icon;
         return (
-          <Card key={card.title} className="transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/25">
+          <Card key={card.title} className="soft-card-hover">
             <CardHeader className="flex flex-row items-center justify-between pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground">{card.title}</CardTitle>
               <Icon className={`h-5 w-5 ${card.color}`} />

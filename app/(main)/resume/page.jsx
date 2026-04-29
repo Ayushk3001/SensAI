@@ -9,6 +9,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import ResumeHistoryList from "./_components/resume-history-list";
 
 export default async function ResumePage() {
@@ -22,8 +24,11 @@ export default async function ResumePage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col justify-between gap-4 rounded-lg border border-border bg-card/80 p-6 shadow-sm   md:flex-row md:items-end">
+      <div className="glass-panel flex flex-col justify-between gap-4 p-6 fade-up md:flex-row md:items-end">
         <div>
+          <Badge variant="outline" className="mb-3 border-primary/25 bg-primary/10 text-primary">
+            Resume intelligence
+          </Badge>
           <h1 className="text-4xl font-extrabold tracking-tight text-foreground md:text-5xl">
             Resume Studio
           </h1>
@@ -40,18 +45,19 @@ export default async function ResumePage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
-        <Card>
+        <Card className="soft-card-hover">
           <CardHeader className="flex flex-row items-center justify-between pb-3">
             <CardTitle className="text-sm font-medium text-muted-foreground">Average ATS Score</CardTitle>
             <Target className="h-5 w-5 text-teal-500" />
           </CardHeader>
           <CardContent>
             <div className="text-4xl font-bold text-foreground">{averageScore.toFixed(1)}%</div>
+            <Progress value={averageScore} className="mt-4" />
             <p className="mt-1 text-xs text-muted-foreground">Across saved interactions</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="soft-card-hover">
           <CardHeader className="flex flex-row items-center justify-between pb-3">
             <CardTitle className="text-sm font-medium text-muted-foreground">Resume Versions</CardTitle>
             <FileText className="h-5 w-5 text-emerald-500" />
@@ -62,7 +68,7 @@ export default async function ResumePage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="soft-card-hover">
           <CardHeader className="flex flex-row items-center justify-between pb-3">
             <CardTitle className="text-sm font-medium text-muted-foreground">Latest / Best</CardTitle>
             <Trophy className="h-5 w-5 text-amber-500" />
@@ -78,7 +84,7 @@ export default async function ResumePage() {
         </Card>
       </div>
 
-      <Card>
+      <Card className="soft-card-hover">
         <CardHeader>
           <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
             <div>

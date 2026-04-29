@@ -34,6 +34,7 @@ body {
     --chart-5: 345 83% 50%;
     --radius: 0.5rem;
   }
+
   .dark {
     --background: 220 22% 6%;
     --foreground: 0 0% 98%;
@@ -66,6 +67,7 @@ body {
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground antialiased;
     background-image:
@@ -81,15 +83,75 @@ body {
   .gradient-title {
     @apply font-extrabold tracking-tight text-foreground;
   }
+
   .page-shell {
     @apply mx-auto w-full max-w-7xl px-4 pb-16 pt-24 sm:px-6 lg:px-8;
   }
+
   .section-card {
-    @apply rounded-lg border border-border bg-card/90 text-card-foreground shadow-sm shadow-slate-200/60 backdrop-blur dark:shadow-none;
+    @apply rounded-lg border border-border/70 bg-card/70 text-card-foreground shadow-sm shadow-slate-200/60 backdrop-blur-xl dark:shadow-black/20;
   }
+
   .metric-card {
-    @apply rounded-lg border border-border bg-card p-5 text-card-foreground shadow-sm transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md dark:shadow-none;
+    @apply rounded-lg border border-border/70 bg-card/65 p-5 text-card-foreground shadow-sm shadow-slate-200/60 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-primary/35 hover:bg-card/80 hover:shadow-xl hover:shadow-primary/10 dark:shadow-black/20;
   }
+
+  .glass-card {
+    @apply rounded-lg border border-border/70 bg-card/60 text-card-foreground shadow-sm shadow-slate-200/60 backdrop-blur-xl dark:shadow-black/20;
+  }
+
+  .glass-panel {
+    @apply rounded-lg border border-border/70 bg-background/70 shadow-xl shadow-slate-200/60 backdrop-blur-xl dark:shadow-black/25;
+  }
+
+  .soft-card-hover {
+    @apply transition-all duration-300 motion-reduce:transition-none hover:-translate-y-1 hover:border-primary/35 hover:shadow-xl hover:shadow-primary/10 motion-reduce:hover:translate-y-0;
+  }
+
+  .fade-up {
+    @apply animate-fade-up motion-reduce:animate-none;
+  }
+
+  .stagger-1 {
+    animation-delay: 80ms;
+  }
+
+  .stagger-2 {
+    animation-delay: 160ms;
+  }
+
+  .stagger-3 {
+    animation-delay: 240ms;
+  }
+
+  .stagger-4 {
+    animation-delay: 320ms;
+  }
+
+  .status-saved {
+    @apply border-slate-400/30 bg-slate-500/10 text-slate-700 dark:text-slate-200;
+  }
+
+  .status-applied {
+    @apply border-secondary/30 bg-secondary/10 text-secondary;
+  }
+
+  .status-interviewing {
+    @apply border-primary/30 bg-primary/10 text-primary;
+  }
+
+  .status-offer {
+    @apply border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300;
+  }
+
+  .status-rejected {
+    @apply border-destructive/30 bg-destructive/10 text-destructive;
+  }
+
+  .status-archived {
+    @apply border-muted-foreground/30 bg-muted text-muted-foreground;
+  }
+
   .text-balance {
     text-wrap: balance;
   }

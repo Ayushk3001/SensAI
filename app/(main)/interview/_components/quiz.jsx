@@ -14,6 +14,8 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import { generateQuiz, saveQuizResult } from "@/actions/interview";
 import QuizResult from "./quiz-result";
 import useFetch from "@/hooks/use-fetch";
@@ -98,10 +100,12 @@ export default function Quiz() {
   // Loading Screen
   if (generatingQuiz) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px]">
+      <Card className="mx-auto max-w-2xl">
+        <CardContent className="flex min-h-[400px] flex-col items-center justify-center">
         <BarLoader width={280} color="hsl(var(--primary))" />
         <p className="text-muted-foreground mt-6 text-sm">Generating smart questions...</p>
-      </div>
+        </CardContent>
+      </Card>
     );
   }
 
@@ -111,7 +115,7 @@ export default function Quiz() {
       <div className="space-y-8">
         <QuizResult result={resultData} hideStartNew={true} />
 
-        <Card className="border-primary/20 bg-card/90">
+        <Card className="border-primary/20 bg-card/70 backdrop-blur-xl soft-card-hover">
           <CardHeader>
             <CardTitle className="text-center text-2xl">Ready for another round?</CardTitle>
           </CardHeader>
@@ -142,8 +146,11 @@ export default function Quiz() {
   // Start Screen
   if (!quizData) {
     return (
-      <Card className="max-w-2xl mx-auto border border-border/50 shadow-2xl">
+      <Card className="max-w-2xl mx-auto border border-border/70 shadow-2xl shadow-primary/10 soft-card-hover">
         <CardHeader className="text-center pt-10 pb-8">
+          <Badge variant="outline" className="mx-auto mb-4 border-primary/25 bg-primary/10 text-primary">
+            AI question set
+          </Badge>
           <div className="mx-auto w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-3xl flex items-center justify-center mb-6">
             <Sparkles className="w-8 h-8 text-primary-foreground" />
           </div>
@@ -183,16 +190,17 @@ export default function Quiz() {
   const question = quizData[currentQuestion];
 
   return (
-    <Card className="max-w-3xl mx-auto border border-border/50 shadow-2xl">
+      <Card className="max-w-3xl mx-auto border border-border/70 shadow-2xl shadow-primary/10">
       <CardHeader className="border-b">
         <div className="flex justify-between items-center">
           <CardTitle className="text-xl">
             Question <span className="text-primary">{currentQuestion + 1}</span> / {quizData.length}
           </CardTitle>
-          <div className="text-xs font-mono bg-muted px-3 py-1 rounded-2xl text-muted-foreground">
+          <Badge variant="secondary">
             {Math.round(((currentQuestion + 1) / quizData.length) * 100)}% complete
-          </div>
+          </Badge>
         </div>
+        <Progress value={((currentQuestion + 1) / quizData.length) * 100} className="mt-4" />
       </CardHeader>
 
       <CardContent className="pt-8 pb-6">
@@ -209,7 +217,7 @@ export default function Quiz() {
           {question.options.map((option, index) => (
             <div
               key={index}
-              className={`flex items-center space-x-4 bg-muted border transition-all rounded-2xl px-6 py-4 ${
+              className={`flex items-center space-x-4 bg-muted/70 border transition-all rounded-lg px-6 py-4 ${
                 showExplanation
                   ? "opacity-75 cursor-not-allowed"
                   : "hover:bg-muted hover:border-primary/30"
@@ -232,7 +240,7 @@ export default function Quiz() {
         </RadioGroup>
 
         {showExplanation && (
-          <div className="mt-10 p-6 bg-muted border border-primary/20 rounded-3xl">
+          <div className="mt-10 rounded-lg border border-primary/20 bg-primary/5 p-6">
             <div className="flex items-center gap-2 text-primary mb-3">
               <Lock className="h-4 w-4" />
               <p className="uppercase text-xs tracking-widest font-medium">Explanation</p>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { Mic, Square, Loader2, UploadCloud, CheckCircle2, ChevronRight, Zap, Brain, MessageSquare, BarChart3, X, ArrowRight } from "lucide-react";
 import pdfToText from "react-pdftotext";
@@ -49,6 +49,20 @@ export default function VoiceInterviewPage() {
   const chatEndRef = useRef(null);
 
   const scrollToBottom = () => chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  const userAnswerCount = messages.filter(m => m.role === "user").length;
+  const canEnd = userAnswerCount >= 4;
+
+  useEffect(() => {
+    if (step !== "interview" || canEnd) return;
+
+    const handleBeforeUnload = (event) => {
+      event.preventDefault();
+      event.returnValue = "Complete at least 4 answers before leaving the interview room.";
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [step, canEnd]);
 
   const resetInterview = () => {
     setResults(null); setMessages([]); setStep("setup");
@@ -114,6 +128,7 @@ export default function VoiceInterviewPage() {
   };
 
   const handleEndInterview = async () => {
+    if (!canEnd) return;
     setIsEvaluating(true);
     try {
       const data = await evaluateVoiceInterview(
@@ -286,14 +301,8 @@ export default function VoiceInterviewPage() {
   }
 
   // ─── INTERVIEW ────────────────────────────────────────────────────────────────
-  const canEnd = messages.length >= 8;
   return (
     <div style={s.root}>
-      <div style={{ padding: "24px 48px 0" }}>
-        <Link href="/interview/voice" style={s.backLink}>
-          Back to Voice Dashboard
-        </Link>
-      </div>
       <div style={s.interviewLayout}>
         {/* Sidebar */}
         <div style={s.sidebar}>
@@ -308,9 +317,9 @@ export default function VoiceInterviewPage() {
           <div style={s.sideSection}>
             <p style={s.sideLabel}>Progress</p>
             <div style={s.progressTrack}>
-              <div style={{ ...s.progressFill, width: `${Math.min(100, (messages.filter(m => m.role === "user").length / 4) * 100)}%` }} />
+              <div style={{ ...s.progressFill, width: `${Math.min(100, (userAnswerCount / 4) * 100)}%` }} />
             </div>
-            <p style={s.progressText}>{messages.filter(m => m.role === "user").length} of ~4 questions answered</p>
+            <p style={s.progressText}>{userAnswerCount} of 4 required answers</p>
           </div>
           <div style={s.sideSection}>
             <p style={s.sideLabel}>Tips</p>
@@ -326,11 +335,21 @@ export default function VoiceInterviewPage() {
           >
             {isEvaluating ? <><Loader2 size={14} style={{ animation: "spin 1s linear infinite" }} /> Evaluating…</> : "End & Evaluate"}
           </button>
-          {!canEnd && <p style={s.endHint}>Answer a few more questions to end</p>}
+          {!canEnd && <p style={s.endHint}>Complete {4 - userAnswerCount} more answer{4 - userAnswerCount === 1 ? "" : "s"} to unlock scoring</p>}
         </div>
 
         {/* Main chat */}
         <div style={s.chatArea}>
+          <div style={s.roomHeader}>
+            <div>
+              <p style={s.roomEyebrow}>Live interview room</p>
+              <h1 style={s.roomTitle}>{selectedType?.label} Interview</h1>
+            </div>
+            <div style={s.roomStatus}>
+              <span style={s.roomDot} />
+              {canEnd ? "Ready to evaluate" : "Interview in progress"}
+            </div>
+          </div>
           <div style={s.chatFeed}>
             {messages.map((msg, i) => (
               <div key={i} style={{ ...s.bubble, ...(msg.role === "user" ? s.bubbleUser : s.bubbleAI) }}>
@@ -459,8 +478,8 @@ const s = {
   startBtnDisabled: { opacity: 0.4, cursor: "not-allowed" },
 
   // INTERVIEW
-  interviewLayout: { display: "flex", height: "100vh" },
-  sidebar: { width: 260, background: "hsl(var(--muted))", borderRight: "1px solid hsl(var(--border))", padding: "28px 24px", display: "flex", flexDirection: "column", flexShrink: 0 },
+  interviewLayout: { display: "flex", height: "calc(100vh - 120px)", minHeight: 640, maxWidth: 1540, margin: "40px auto", border: "1px solid hsl(var(--border))", borderRadius: 14, overflow: "hidden", background: "hsl(var(--card) / 0.52)", boxShadow: "0 24px 70px -42px hsl(var(--foreground) / 0.55)", backdropFilter: "blur(20px)" },
+  sidebar: { width: 300, background: "hsl(var(--card) / 0.72)", borderRight: "1px solid hsl(var(--border))", padding: "32px 28px", display: "flex", flexDirection: "column", flexShrink: 0 },
   sideSection: { marginTop: 28 },
   sideLabel: { fontSize: 11, fontWeight: 600, color: "hsl(var(--muted-foreground))", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 8 },
   sideBadge: { display: "inline-flex", alignItems: "center", gap: 6, background: "hsl(var(--primary) / 0.12)", border: "1px solid hsl(var(--primary) / 0.35)", borderRadius: 6, padding: "5px 10px", fontSize: 13, color: "hsl(var(--primary))", fontWeight: 500 },
@@ -473,21 +492,26 @@ const s = {
   endBtnDisabled: { opacity: 0.3, cursor: "not-allowed" },
   endHint: { fontSize: 11, color: "hsl(var(--muted-foreground))", textAlign: "center", marginTop: 6 },
 
-  chatArea: { flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" },
-  chatFeed: { flex: 1, overflowY: "auto", padding: "32px 40px", display: "flex", flexDirection: "column", gap: 20 },
+  chatArea: { flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", background: "hsl(var(--background) / 0.38)" },
+  roomHeader: { minHeight: 86, borderBottom: "1px solid hsl(var(--border))", padding: "20px 32px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 20, background: "hsl(var(--card) / 0.60)" },
+  roomEyebrow: { margin: 0, marginBottom: 4, fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "hsl(var(--primary))" },
+  roomTitle: { margin: 0, fontSize: 24, fontWeight: 800, color: "hsl(var(--foreground))", letterSpacing: "-0.02em" },
+  roomStatus: { display: "inline-flex", alignItems: "center", gap: 8, border: "1px solid hsl(var(--border))", borderRadius: 999, padding: "7px 12px", color: "hsl(var(--muted-foreground))", fontSize: 12, fontWeight: 600, background: "hsl(var(--background) / 0.55)" },
+  roomDot: { width: 7, height: 7, borderRadius: "50%", background: "hsl(var(--primary))", boxShadow: "0 0 0 4px hsl(var(--primary) / 0.12)" },
+  chatFeed: { flex: 1, overflowY: "auto", padding: "40px 48px", display: "flex", flexDirection: "column", gap: 20 },
   bubble: { display: "flex", alignItems: "flex-start", gap: 12 },
   bubbleUser: { flexDirection: "row-reverse" },
   bubbleAI: { flexDirection: "row" },
   aiAvatar: { width: 32, height: 32, borderRadius: "50%", background: "hsl(var(--primary) / 0.12)", border: "1px solid hsl(var(--primary) / 0.35)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700, color: "hsl(var(--primary))", flexShrink: 0 },
-  bubbleInner: { maxWidth: "68%", borderRadius: 14, padding: "12px 16px" },
-  bubbleInnerAI: { background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderTopLeftRadius: 4 },
+  bubbleInner: { maxWidth: "72%", borderRadius: 14, padding: "16px 18px" },
+  bubbleInnerAI: { background: "hsl(var(--card) / 0.86)", border: "1px solid hsl(var(--border))", borderTopLeftRadius: 4, boxShadow: "0 16px 40px -28px hsl(var(--foreground) / 0.45)" },
   bubbleInnerUser: { background: "hsl(var(--primary) / 0.14)", border: "1px solid hsl(var(--primary) / 0.35)", borderTopRightRadius: 4 },
   bubbleText: { fontSize: 14, lineHeight: 1.7, color: "hsl(var(--foreground))", margin: 0 },
   bubbleTime: { fontSize: 11, color: "hsl(var(--muted-foreground))", marginTop: 4, textAlign: "right" },
   typingDots: { display: "flex", gap: 5, alignItems: "center", padding: "2px 0" },
   dot: { width: 7, height: 7, borderRadius: "50%", background: "hsl(var(--muted-foreground))", animation: "pulse 1.2s ease-in-out infinite" },
 
-  micBar: { borderTop: "1px solid hsl(var(--border))", background: "hsl(var(--muted))", padding: "20px 40px" },
+  micBar: { borderTop: "1px solid hsl(var(--border))", background: "hsl(var(--card) / 0.70)", padding: "18px 40px" },
   micBarInner: { display: "flex", flexDirection: "column", alignItems: "center", gap: 10 },
   recordingIndicator: { display: "flex", alignItems: "center", gap: 8 },
   recDot: { width: 8, height: 8, borderRadius: "50%", background: "hsl(var(--destructive))", animation: "pulse 1s ease-in-out infinite" },

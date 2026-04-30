@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format, parse } from "date-fns";
 import { Button } from "@/components/ui/button";
+import { DeleteConfirmButton } from "@/components/delete-confirm-button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -110,14 +111,18 @@ export function EntryForm({ type, entries, onChange }) {
               <CardTitle className="text-sm font-medium">
                 {item.title} @ {item.organization}
               </CardTitle>
-              <Button
-                variant="outline"
-                size="icon"
-                type="button"
-                onClick={() => handleDelete(index)}
+              <DeleteConfirmButton
+                title={`Are you sure you want to delete this ${type.toLowerCase()}?`}
+                description="This entry will be removed from your resume."
+                onConfirm={() => handleDelete(index)}
+                buttonProps={{
+                  variant: "outline",
+                  size: "icon",
+                  type: "button",
+                }}
               >
                 <X className="h-4 w-4" />
-              </Button>
+              </DeleteConfirmButton>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">

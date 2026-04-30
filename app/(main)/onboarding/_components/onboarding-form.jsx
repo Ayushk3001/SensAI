@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
+import { BriefcaseBusiness, Loader2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import {
   Card,
@@ -13,6 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -76,9 +77,18 @@ const OnboardingForm = ({ industries }) => {
   const watchIndustry = watch("industry");
 
   return (
-    <div className="flex items-center justify-center bg-background">
-      <Card className="w-full max-w-lg mt-10 mx-2">
+    <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center bg-background px-2 py-10">
+      <Card className="w-full max-w-2xl soft-card-hover">
         <CardHeader>
+          <Badge variant="outline" className="mb-3 w-fit border-primary/25 bg-primary/10 text-primary">
+            <Sparkles className="mr-1 h-3 w-3" />
+            Personalize SensAI
+          </Badge>
+          <div className="flex items-start gap-4">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <BriefcaseBusiness className="h-6 w-6" />
+            </div>
+            <div>
           <CardTitle className="gradient-title text-4xl">
             Complete Your Profile
           </CardTitle>
@@ -86,6 +96,8 @@ const OnboardingForm = ({ industries }) => {
             Select your industry to get personalized career insights and
             recommendations.
           </CardDescription>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">

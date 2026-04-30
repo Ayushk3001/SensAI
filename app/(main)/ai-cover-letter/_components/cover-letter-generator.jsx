@@ -16,13 +16,13 @@ const COVER_FEATURES = [
   { icon: "◆", text: "Professional tone & structure" },
 ];
 
-const ScoreRing = ({ score, max = 10, size = 80, stroke = 6, color = "#7c3aed" }) => {
+const ScoreRing = ({ score, max = 10, size = 80, stroke = 6, color = "hsl(var(--primary))" }) => {
   const r = (size - stroke) / 2;
   const circ = 2 * Math.PI * r;
   const filled = (score / max) * circ;
   return (
     <svg width={size} height={size} style={{ transform: "rotate(-90deg)" }}>
-      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={stroke} />
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="hsl(var(--muted))" strokeWidth={stroke} />
       <circle
         cx={size / 2} cy={size / 2} r={r} fill="none"
         stroke={color} strokeWidth={stroke}
@@ -110,8 +110,8 @@ export default function CoverLetterGenerator() {
           {/* Mini preview hint */}
           <div style={s.miniPreview}>
             <div style={s.miniPreviewInner}>
-              <FileText size={18} color="#7c3aed" />
-              <span style={{ fontSize: 13, color: "#a78bfa" }}>Takes ~8 seconds • 98% ATS pass rate</span>
+              <FileText size={18} color="hsl(var(--primary))" />
+              <span style={{ fontSize: 13, color: "hsl(var(--primary))" }}>Takes ~8 seconds • 98% ATS pass rate</span>
             </div>
           </div>
         </div>
@@ -172,7 +172,7 @@ export default function CoverLetterGenerator() {
             >
               {resumeFile ? (
                 <div style={s.dropzoneDoneInner}>
-                  <CheckCircle2 size={18} color="#22c55e" />
+                  <CheckCircle2 size={18} color="hsl(var(--primary))" />
                   <span style={s.fileNameText}>{resumeFile.name}</span>
                   <button
                     type="button"
@@ -184,7 +184,7 @@ export default function CoverLetterGenerator() {
                 </div>
               ) : (
                 <>
-                  <UploadCloud size={24} color="#6b7280" />
+                  <UploadCloud size={24} color="hsl(var(--muted-foreground))" />
                   <span style={s.dropzoneText}>
                     Drop PDF here or{" "}
                     <label style={s.browseLink}>
@@ -234,7 +234,7 @@ export default function CoverLetterGenerator() {
         textarea:focus, input:focus { outline: none; }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: hsl(var(--border)); border-radius: 4px; }
       `}</style>
     </div>
   );
@@ -242,37 +242,37 @@ export default function CoverLetterGenerator() {
 
 // ─── REUSED STYLES FROM VOICEINTERVIEWPAGE (100% consistent) ───────────────────
 const s = {
-  root: { minHeight: "100vh", background: "#080808", color: "#e5e5e5", fontFamily: "'DM Sans', 'Inter', system-ui, sans-serif" },
+  root: { minHeight: "100vh", background: "hsl(var(--background))", color: "hsl(var(--foreground))", fontFamily: "'DM Sans', 'Inter', system-ui, sans-serif" },
   setupGrid: { display: "flex", minHeight: "100vh", alignItems: "stretch" },
-  leftPanel: { width: "420px", flexShrink: 0, background: "linear-gradient(160deg, #0f0f0f 0%, #111 100%)", padding: "60px 48px", display: "flex", flexDirection: "column", borderRight: "1px solid #1a1a1a" },
+  leftPanel: { width: "420px", flexShrink: 0, background: "linear-gradient(160deg, hsl(var(--card)) 0%, hsl(var(--muted)) 100%)", padding: "60px 48px", display: "flex", flexDirection: "column", borderRight: "1px solid hsl(var(--border))" },
   brand: { display: "flex", alignItems: "center", gap: 8, marginBottom: 64 },
-  brandDot: { width: 8, height: 8, borderRadius: "50%", background: "#7c3aed" },
-  brandText: { fontSize: 14, fontWeight: 600, color: "#fff", letterSpacing: "0.04em" },
-  heroTitle: { fontSize: 44, fontWeight: 700, lineHeight: 1.1, color: "#fff", marginBottom: 16 },
-  heroAccent: { color: "#7c3aed" },
-  heroSub: { fontSize: 15, color: "#6b7280", lineHeight: 1.7, marginBottom: 48 },
+  brandDot: { width: 8, height: 8, borderRadius: "50%", background: "hsl(var(--primary))" },
+  brandText: { fontSize: 14, fontWeight: 600, color: "hsl(var(--foreground))", letterSpacing: "0.04em" },
+  heroTitle: { fontSize: 44, fontWeight: 700, lineHeight: 1.1, color: "hsl(var(--foreground))", marginBottom: 16 },
+  heroAccent: { color: "hsl(var(--primary))" },
+  heroSub: { fontSize: 15, color: "hsl(var(--muted-foreground))", lineHeight: 1.7, marginBottom: 48 },
   featureList: { display: "flex", flexDirection: "column", gap: 16 },
   featureItem: { display: "flex", alignItems: "center", gap: 12 },
-  featureIcon: { fontSize: 16, color: "#7c3aed" },
-  featureText: { fontSize: 14, color: "#9ca3af" },
-  miniPreview: { marginTop: "auto", padding: "14px 20px", background: "#111", borderRadius: 12, border: "1px solid #1f1f1f" },
+  featureIcon: { fontSize: 16, color: "hsl(var(--primary))" },
+  featureText: { fontSize: 14, color: "hsl(var(--muted-foreground))" },
+  miniPreview: { marginTop: "auto", padding: "14px 20px", background: "hsl(var(--card))", borderRadius: 8, border: "1px solid hsl(var(--border))" },
   miniPreviewInner: { display: "flex", alignItems: "center", gap: 10 },
   formCard: { flex: 1, padding: "60px 48px", overflowY: "auto", display: "flex", flexDirection: "column" },
-  formLabel: { fontSize: 12, fontWeight: 600, color: "#6b7280", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 12 },
+  formLabel: { fontSize: 12, fontWeight: 600, color: "hsl(var(--muted-foreground))", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 12 },
   inputRow: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 },
   inputGroup: { display: "flex", flexDirection: "column" },
-  inputLabel: { fontSize: 13, color: "#9ca3af", marginBottom: 6, fontWeight: 500 },
-  input: { background: "#111", border: "1px solid #1f1f1f", borderRadius: 10, padding: "14px 16px", fontSize: 15, color: "#e5e5e5", fontFamily: "inherit" },
-  errorText: { fontSize: 12, color: "#ef4444", marginTop: 4 },
-  textarea: { width: "100%", background: "#111", border: "1px solid #1f1f1f", borderRadius: 10, padding: "14px 16px", fontSize: 14, color: "#e5e5e5", lineHeight: 1.6, resize: "vertical", fontFamily: "inherit", minHeight: 140 },
-  dropzone: { border: "1px dashed #2a2a2a", borderRadius: 10, padding: "32px 24px", display: "flex", alignItems: "center", justifyContent: "center", gap: 12, cursor: "pointer", transition: "all 0.15s", background: "#0d0d0d", flexDirection: "column" },
-  dropzoneActive: { border: "1px dashed #7c3aed", background: "#13082a" },
-  dropzoneDone: { border: "1px solid #166534", background: "#052e16" },
+  inputLabel: { fontSize: 13, color: "hsl(var(--muted-foreground))", marginBottom: 6, fontWeight: 500 },
+  input: { background: "hsl(var(--card))", border: "1px solid hsl(var(--input))", borderRadius: 8, padding: "14px 16px", fontSize: 15, color: "hsl(var(--foreground))", fontFamily: "inherit" },
+  errorText: { fontSize: 12, color: "hsl(var(--destructive))", marginTop: 4 },
+  textarea: { width: "100%", background: "hsl(var(--card))", border: "1px solid hsl(var(--input))", borderRadius: 8, padding: "14px 16px", fontSize: 14, color: "hsl(var(--foreground))", lineHeight: 1.6, resize: "vertical", fontFamily: "inherit", minHeight: 140 },
+  dropzone: { border: "1px dashed hsl(var(--border))", borderRadius: 8, padding: "32px 24px", display: "flex", alignItems: "center", justifyContent: "center", gap: 12, cursor: "pointer", transition: "all 0.15s", background: "hsl(var(--muted))", flexDirection: "column" },
+  dropzoneActive: { border: "1px dashed hsl(var(--primary))", background: "hsl(var(--primary) / 0.10)" },
+  dropzoneDone: { border: "1px solid hsl(var(--primary))", background: "hsl(var(--primary) / 0.10)" },
   dropzoneDoneInner: { display: "flex", alignItems: "center", gap: 12, width: "100%" },
-  dropzoneText: { fontSize: 14, color: "#6b7280", textAlign: "center" },
-  browseLink: { color: "#7c3aed", cursor: "pointer", fontWeight: 600 },
-  fileNameText: { fontSize: 14, color: "#22c55e", fontWeight: 500, flex: 1 },
-  removeBtn: { background: "none", border: "none", color: "#6b7280", cursor: "pointer", padding: 4, display: "flex", alignItems: "center" },
-  startBtn: { width: "100%", background: "#7c3aed", border: "none", borderRadius: 10, padding: "16px 24px", color: "#fff", fontSize: 16, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, transition: "all 0.15s", letterSpacing: "0.01em" },
+  dropzoneText: { fontSize: 14, color: "hsl(var(--muted-foreground))", textAlign: "center" },
+  browseLink: { color: "hsl(var(--primary))", cursor: "pointer", fontWeight: 600 },
+  fileNameText: { fontSize: 14, color: "hsl(var(--primary))", fontWeight: 500, flex: 1 },
+  removeBtn: { background: "none", border: "none", color: "hsl(var(--muted-foreground))", cursor: "pointer", padding: 4, display: "flex", alignItems: "center" },
+  startBtn: { width: "100%", background: "hsl(var(--primary))", border: "none", borderRadius: 8, padding: "16px 24px", color: "hsl(var(--primary-foreground))", fontSize: 16, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, transition: "all 0.15s", letterSpacing: "0.01em" },
   startBtnDisabled: { opacity: 0.45, cursor: "not-allowed" },
 };

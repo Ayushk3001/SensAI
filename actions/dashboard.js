@@ -106,3 +106,56 @@ export async function getIndustryInsights() {
     throw new Error("Failed to fetch industry insights");
   }
 }
+
+export async function getCareerDashboardData() {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+
+  const user = await db.user.findUnique({
+    where: { clerkUserId: userId },
+  });
+
+  if (!user) throw new Error("User not found");
+
+  const [
+    assessments,
+    voiceInterviews,
+    roadmaps,
+    resumeVersions,
+    jobApplications,
+  ] = await Promise.all([
+    db.assessment.findMany({
+      where: { userId: user.id },
+      orderBy: { createdAt: "desc" },
+      take: 8,
+    }),
+    db.voiceInterview.findMany({
+      where: { userId: user.id },
+      orderBy: { createdAt: "desc" },
+      take: 8,
+    }),
+    db.roadmap.findMany({
+      where: { userId: user.id },
+      orderBy: { createdAt: "desc" },
+      take: 6,
+    }),
+    db.resumeVersion.findMany({
+      where: { userId: user.id },
+      orderBy: { createdAt: "desc" },
+      take: 6,
+    }),
+    db.jobApplication.findMany({
+      where: { userId: user.id },
+      orderBy: { updatedAt: "desc" },
+      take: 20,
+    }),
+  ]);
+
+  return {
+    assessments,
+    voiceInterviews,
+    roadmaps,
+    resumeVersions,
+    jobApplications,
+  };
+}

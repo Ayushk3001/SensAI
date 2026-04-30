@@ -14,6 +14,8 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import { generateQuiz, saveQuizResult } from "@/actions/interview";
 import QuizResult from "./quiz-result";
 import useFetch from "@/hooks/use-fetch";
@@ -98,10 +100,12 @@ export default function Quiz() {
   // Loading Screen
   if (generatingQuiz) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px]">
-        <BarLoader width={280} color="#a78bfa" />
-        <p className="text-zinc-400 mt-6 text-sm">Generating smart questions...</p>
-      </div>
+      <Card className="mx-auto max-w-2xl">
+        <CardContent className="flex min-h-[400px] flex-col items-center justify-center">
+        <BarLoader width={280} color="hsl(var(--primary))" />
+        <p className="text-muted-foreground mt-6 text-sm">Generating smart questions...</p>
+        </CardContent>
+      </Card>
     );
   }
 
@@ -111,7 +115,7 @@ export default function Quiz() {
       <div className="space-y-8">
         <QuizResult result={resultData} hideStartNew={true} />
 
-        <Card className="border-purple-500/20 bg-card/90">
+        <Card className="border-primary/20 bg-card/70 backdrop-blur-xl soft-card-hover">
           <CardHeader>
             <CardTitle className="text-center text-2xl">Ready for another round?</CardTitle>
           </CardHeader>
@@ -119,7 +123,7 @@ export default function Quiz() {
             <Button
               size="lg"
               onClick={retakeSameTopic}
-              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white px-8"
+              className="bg-gradient-to-r from-primary to-secondary hover:from-primary hover:to-secondary text-primary-foreground px-8"
             >
               <RotateCcw className="mr-2 h-4 w-4" />
               Retake {topic ? `"${topic}"` : "General Quiz"}
@@ -128,7 +132,7 @@ export default function Quiz() {
           <CardFooter>
             <Button
               variant="ghost"
-              className="w-full text-zinc-400 hover:text-white"
+              className="w-full text-muted-foreground hover:text-foreground"
               onClick={() => router.push("/interview")}
             >
               ← Return to Interview Insights
@@ -142,20 +146,23 @@ export default function Quiz() {
   // Start Screen
   if (!quizData) {
     return (
-      <Card className="max-w-2xl mx-auto border border-border/50 shadow-2xl">
+      <Card className="max-w-2xl mx-auto border border-border/70 shadow-2xl shadow-primary/10 soft-card-hover">
         <CardHeader className="text-center pt-10 pb-8">
-          <div className="mx-auto w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-3xl flex items-center justify-center mb-6">
-            <Sparkles className="w-8 h-8 text-white" />
+          <Badge variant="outline" className="mx-auto mb-4 border-primary/25 bg-primary/10 text-primary">
+            AI question set
+          </Badge>
+          <div className="mx-auto w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-3xl flex items-center justify-center mb-6">
+            <Sparkles className="w-8 h-8 text-primary-foreground" />
           </div>
           <CardTitle className="text-4xl font-bold tracking-tighter">Test Your Knowledge</CardTitle>
-          <p className="text-zinc-400 mt-3 max-w-xs mx-auto">
+          <p className="text-muted-foreground mt-3 max-w-xs mx-auto">
             10 targeted technical questions. Choose a topic or go general.
           </p>
         </CardHeader>
 
         <CardContent className="px-10 pb-10 space-y-8">
           <div className="space-y-3">
-            <Label className="text-zinc-300">Specific Topic (optional)</Label>
+            <Label className="text-foreground">Specific Topic (optional)</Label>
             <Input
               placeholder="e.g. React Server Components, System Design, Python OOP..."
               value={topic}
@@ -169,7 +176,7 @@ export default function Quiz() {
           <Button
             onClick={handleStartQuiz}
             size="lg"
-            className="w-full h-14 text-lg bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500"
+            className="w-full h-14 text-lg bg-gradient-to-r from-primary to-secondary hover:from-primary hover:to-secondary"
           >
             Start Quiz
             <ArrowRight className="ml-3" />
@@ -183,20 +190,21 @@ export default function Quiz() {
   const question = quizData[currentQuestion];
 
   return (
-    <Card className="max-w-3xl mx-auto border border-border/50 shadow-2xl">
+      <Card className="max-w-3xl mx-auto border border-border/70 shadow-2xl shadow-primary/10">
       <CardHeader className="border-b">
         <div className="flex justify-between items-center">
           <CardTitle className="text-xl">
-            Question <span className="text-purple-400">{currentQuestion + 1}</span> / {quizData.length}
+            Question <span className="text-primary">{currentQuestion + 1}</span> / {quizData.length}
           </CardTitle>
-          <div className="text-xs font-mono bg-zinc-900 px-3 py-1 rounded-2xl text-zinc-400">
+          <Badge variant="secondary">
             {Math.round(((currentQuestion + 1) / quizData.length) * 100)}% complete
-          </div>
+          </Badge>
         </div>
+        <Progress value={((currentQuestion + 1) / quizData.length) * 100} className="mt-4" />
       </CardHeader>
 
       <CardContent className="pt-8 pb-6">
-        <p className="text-xl font-medium leading-relaxed text-white mb-8">
+        <p className="text-xl font-medium leading-relaxed text-foreground mb-8">
           {question.question}
         </p>
 
@@ -209,10 +217,10 @@ export default function Quiz() {
           {question.options.map((option, index) => (
             <div
               key={index}
-              className={`flex items-center space-x-4 bg-zinc-900 border transition-all rounded-2xl px-6 py-4 ${
+              className={`flex items-center space-x-4 bg-muted/70 border transition-all rounded-lg px-6 py-4 ${
                 showExplanation
                   ? "opacity-75 cursor-not-allowed"
-                  : "hover:bg-zinc-800 hover:border-purple-500/30"
+                  : "hover:bg-muted hover:border-primary/30"
               }`}
             >
               <RadioGroupItem value={option} id={`opt-${index}`} disabled={showExplanation} />
@@ -225,19 +233,19 @@ export default function Quiz() {
                 {option}
               </Label>
               {showExplanation && answers[currentQuestion] === option && (
-                <Lock className="h-4 w-4 text-purple-400" />
+                <Lock className="h-4 w-4 text-primary" />
               )}
             </div>
           ))}
         </RadioGroup>
 
         {showExplanation && (
-          <div className="mt-10 p-6 bg-zinc-900 border border-purple-500/20 rounded-3xl">
-            <div className="flex items-center gap-2 text-purple-400 mb-3">
+          <div className="mt-10 rounded-lg border border-primary/20 bg-primary/5 p-6">
+            <div className="flex items-center gap-2 text-primary mb-3">
               <Lock className="h-4 w-4" />
               <p className="uppercase text-xs tracking-widest font-medium">Explanation</p>
             </div>
-            <p className="text-zinc-300 leading-relaxed">{question.explanation}</p>
+            <p className="text-foreground leading-relaxed">{question.explanation}</p>
           </div>
         )}
       </CardContent>
@@ -248,7 +256,7 @@ export default function Quiz() {
             variant="outline"
             onClick={() => setShowExplanation(true)}
             disabled={!answers[currentQuestion]}
-            className="border-purple-500/30 text-purple-300 hover:bg-purple-950"
+            className="border-primary/30 text-primary hover:bg-primary/10"
           >
             Show Explanation
           </Button>
@@ -258,7 +266,7 @@ export default function Quiz() {
           onClick={handleNext}
           disabled={!answers[currentQuestion] || savingResult}
           size="lg"
-          className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 px-10"
+          className="bg-gradient-to-r from-primary to-secondary hover:from-primary hover:to-secondary px-10"
         >
           {currentQuestion < quizData.length - 1 ? "Next Question →" : "Finish Quiz"}
         </Button>

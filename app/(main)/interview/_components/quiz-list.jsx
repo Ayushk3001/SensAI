@@ -18,6 +18,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import QuizResult from "./quiz-result";
+import { Badge } from "@/components/ui/badge";
 
 export default function QuizList({ assessments }) {
   const router = useRouter();
@@ -25,20 +26,20 @@ export default function QuizList({ assessments }) {
 
   return (
     <>
-      <Card className="border border-border/50 shadow-xl">
+      <Card className="soft-card-hover">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-3xl font-semibold tracking-tight bg-gradient-to-r from-white to-zinc-300 bg-clip-text text-transparent">
+              <CardTitle className="text-3xl font-semibold tracking-tight text-card-foreground">
                 Recent Quizzes
               </CardTitle>
-              <CardDescription className="text-zinc-400">
+              <CardDescription className="text-muted-foreground">
                 Review your past performance
               </CardDescription>
             </div>
             <Button
               onClick={() => router.push("/interview/mock")}
-              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500"
+              className="bg-gradient-to-r from-primary to-secondary hover:from-primary hover:to-secondary"
             >
               Start New Quiz
             </Button>
@@ -50,24 +51,24 @@ export default function QuizList({ assessments }) {
             {assessments?.map((assessment, i) => (
               <Card
                 key={assessment.id}
-                className="cursor-pointer hover:bg-zinc-900/70 border border-transparent hover:border-purple-500/30 transition-all p-4"
+                className="cursor-pointer border border-border/70 bg-card/60 p-4 transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:bg-card/80"
                 onClick={() => setSelectedQuiz(assessment)}
               >
                 <div className="flex items-center justify-between">
                   <div>
                     <CardTitle className="text-xl">Quiz #{i + 1}</CardTitle>
-                    <CardDescription className="text-zinc-400">
+                    <CardDescription className="text-muted-foreground">
                       {format(new Date(assessment.createdAt), "MMMM dd, yyyy • HH:mm")}
                     </CardDescription>
                   </div>
                   <div className="text-right">
-                    <div className="text-2xl font-bold text-purple-400">
+                    <Badge variant="outline" className="border-primary/25 bg-primary/10 text-primary text-base">
                       {assessment.quizScore.toFixed(1)}%
-                    </div>
+                    </Badge>
                   </div>
                 </div>
                 {assessment.improvementTip && (
-                  <p className="text-xs text-zinc-400 mt-4 line-clamp-2">
+                  <p className="text-xs text-muted-foreground mt-4 line-clamp-2">
                     {assessment.improvementTip}
                   </p>
                 )}
@@ -78,7 +79,7 @@ export default function QuizList({ assessments }) {
       </Card>
 
       <Dialog open={!!selectedQuiz} onOpenChange={() => setSelectedQuiz(null)}>
-        <DialogContent className="max-w-4xl max-h-[92vh] overflow-y-auto bg-zinc-950 border-zinc-800">
+        <DialogContent className="max-w-4xl max-h-[92vh] overflow-y-auto bg-card border-border">
           <DialogHeader>
             <DialogTitle className="sr-only">Quiz Result</DialogTitle>
           </DialogHeader>

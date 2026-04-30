@@ -26,7 +26,11 @@ model User {
   skills        String[]  // Array of skills
   assessments   Assessment[]
   resume        Resume?
+  resumeVersions ResumeVersion[]
   coverLetter   CoverLetter[]
+  voiceInterviews VoiceInterview[]
+  roadmaps      Roadmap[]
+  jobApplications JobApplication[]
 }
 
 model Assessment {
@@ -96,4 +100,78 @@ model IndustryInsight {
   nextUpdate    DateTime  // Scheduled update time
 
   @@index([industry])
+}
+
+model ResumeVersion {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id])
+  title           String
+  content         String    @db.Text
+  jobDescription  String?   @db.Text
+  atsScore        Float?
+  missingKeywords String[]
+  recommendations String[]
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model VoiceInterview {
+  id             String    @id @default(cuid())
+  userId         String
+  user           User      @relation(fields: [userId], references: [id])
+  jobTitle       String    @default("Mock Interview")
+  interviewType  String
+  jobDescription String    @default("") @db.Text
+  transcript     Json[]
+  scores         Json      @default("{}")
+  feedback       String?   @db.Text
+  keyMetrics     String[]  @default([])
+  rating         Float?
+  status         String    @default("completed")
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([interviewType])
+  @@index([createdAt])
+}
+
+model Roadmap {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  targetRole  String
+  nodes       Json
+  edges       Json
+  completedNodeIds String[] @default([])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model JobApplication {
+  id             String    @id @default(cuid())
+  userId         String
+  user           User      @relation(fields: [userId], references: [id])
+  companyName    String
+  jobTitle       String
+  status         String    @default("saved")
+  location       String?
+  jobUrl         String?
+  notes          String?   @db.Text
+  resumeVersionId String?
+  coverLetterId String?
+  appliedAt      DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
 }

@@ -22,7 +22,7 @@ export default async function Header() {
             className="h-10 w-auto rounded-md bg-foreground px-2 py-1 object-contain shadow-sm ring-1 ring-border dark:bg-transparent dark:px-0 dark:py-0 dark:ring-0"
             priority
           />
-          <span className="hidden rounded-full border border-purple-500/20 bg-purple-500/10 px-2.5 py-1 text-xs font-semibold text-purple-600 dark:text-purple-400 md:inline-flex">
+          <span className="hidden rounded-md border border-primary/20 bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary md:inline-flex">
             Career OS
           </span>
         </Link>

@@ -97,8 +97,8 @@ const config = {
           "100%": { backgroundPosition: "200% center" },
         },
         "glow-pulse": {
-          "0%, 100%": { boxShadow: "0 0 20px rgba(124, 58, 237, 0.1)" },
-          "50%": { boxShadow: "0 0 40px rgba(124, 58, 237, 0.25)" },
+          "0%, 100%": { boxShadow: "0 0 20px hsl(var(--primary) / 0.10)" },
+          "50%": { boxShadow: "0 0 40px hsl(var(--primary) / 0.22)" },
         },
         "pulse-soft": {
           "0%, 100%": { opacity: "1" },

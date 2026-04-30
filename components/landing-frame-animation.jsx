@@ -356,20 +356,21 @@ export default function LandingFrameAnimation({ className }) {
         fill
         priority
         sizes="100vw"
-        className="object-cover"
+        className="object-cover brightness-[0.78] contrast-[1.28] saturate-[1.18] dark:brightness-100 dark:contrast-100 dark:saturate-100"
       />
       <canvas
         ref={canvasRef}
         aria-hidden="true"
         className={cn(
-          "absolute inset-0 h-full w-full transition-opacity duration-700 motion-reduce:opacity-0",
+          "absolute inset-0 h-full w-full brightness-[0.78] contrast-[1.28] saturate-[1.18] transition-opacity duration-700 motion-reduce:opacity-0 dark:brightness-100 dark:contrast-100 dark:saturate-100",
           isCanvasReady && !prefersReducedMotion ? "opacity-100" : "opacity-0"
         )}
       />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,transparent_0,hsl(var(--background)/0.18)_35%,hsl(var(--background)/0.74)_100%)] sm:bg-[radial-gradient(circle_at_50%_30%,transparent_0,hsl(var(--background)/0.04)_35%,hsl(var(--background)/0.50)_100%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-background/95 via-background/66 to-background sm:from-background/76 sm:via-background/22 sm:to-background/96" />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-background via-background/90 to-transparent" />
-      <div className="pointer-events-none absolute inset-0 opacity-[0.18] mix-blend-overlay [background-image:linear-gradient(hsl(var(--foreground)/0.18)_1px,transparent_1px),linear-gradient(90deg,hsl(var(--foreground)/0.18)_1px,transparent_1px)] [background-size:48px_48px]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_56%_34%,transparent_0,hsl(var(--foreground)/0.04)_42%,hsl(var(--foreground)/0.10)_100%)] dark:bg-[radial-gradient(circle_at_50%_30%,transparent_0,hsl(var(--background)/0.04)_35%,hsl(var(--background)/0.50)_100%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-background/90 via-background/48 to-background/10 dark:from-background/42 dark:via-background/18 dark:to-transparent" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-background/56 via-background/18 to-background/92 dark:from-background/76 dark:via-background/22 dark:to-background/96" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-background via-background/82 to-transparent dark:via-background/90" />
+      <div className="pointer-events-none absolute inset-0 opacity-[0.22] mix-blend-multiply [background-image:linear-gradient(hsl(var(--foreground)/0.16)_1px,transparent_1px),linear-gradient(90deg,hsl(var(--foreground)/0.16)_1px,transparent_1px)] [background-size:48px_48px] dark:opacity-[0.18] dark:mix-blend-overlay" />
       {!isCanvasReady && !prefersReducedMotion ? (
         <div
           className="pointer-events-none absolute bottom-6 left-1/2 h-1 w-40 -translate-x-1/2 overflow-hidden rounded-full bg-card/40 backdrop-blur-xl"

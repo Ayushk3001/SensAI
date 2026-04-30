@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
 import {
   BarChart,
   Bar,
@@ -22,10 +21,8 @@ import {
   FileText,
   Map,
   Mic,
-  PenLine,
-  Target,
   Sparkles,
-  ArrowRight,
+  Target,
 } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
 import {
@@ -37,15 +34,8 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Tooltip as UiTooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 
 const chartStroke = "hsl(var(--primary))";
 const blue = "hsl(var(--secondary))";
@@ -156,14 +146,6 @@ const DashboardView = ({ insights, careerData = {} }) => {
   const nextUpdateDistance = formatDistanceToNow(new Date(insights.nextUpdate), {
     addSuffix: true,
   });
-  const quickActions = [
-    { href: "/resume", label: "Resume", icon: FileText, helper: "Tailor and score" },
-    { href: "/ai-cover-letter", label: "Cover Letter", icon: PenLine, helper: "Generate letters" },
-    { href: "/interview/mock", label: "Interview Prep", icon: Brain, helper: "Quiz practice" },
-    { href: "/interview/voice", label: "Voice Interview", icon: Mic, helper: "Speaking practice" },
-    { href: "/roadmap", label: "Roadmap", icon: Map, helper: "Build a path" },
-    { href: "/job-tracker", label: "Jobs", icon: BriefcaseIcon, helper: "Track pipeline" },
-  ];
 
   return (
     <div className="space-y-6">
@@ -184,37 +166,6 @@ const DashboardView = ({ insights, careerData = {} }) => {
           Last updated: {lastUpdatedDate}
         </Badge>
       </div>
-
-      <TooltipProvider>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-          {quickActions.map((action) => {
-            const Icon = action.icon;
-            return (
-              <TooltipProvider key={action.href}>
-                <UiTooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="outline" className="h-auto justify-between bg-card/55 p-4 backdrop-blur-xl soft-card-hover" asChild>
-                      <Link href={action.href}>
-                        <span className="flex items-center gap-3 text-left">
-                          <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                            <Icon className="h-5 w-5" />
-                          </span>
-                          <span>
-                            <span className="block text-sm font-semibold">{action.label}</span>
-                            <span className="block text-xs text-muted-foreground">{action.helper}</span>
-                          </span>
-                        </span>
-                        <ArrowRight className="h-4 w-4 text-muted-foreground" />
-                      </Link>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Open {action.label}</TooltipContent>
-                </UiTooltip>
-              </TooltipProvider>
-            );
-          })}
-        </div>
-      </TooltipProvider>
 
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
